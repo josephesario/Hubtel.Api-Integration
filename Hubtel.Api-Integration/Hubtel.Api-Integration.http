@@ -1,0 +1,6 @@
+@Hubtel.Api_Integration_HostAddress = http://localhost:5208
+
+GET {{Hubtel.Api_Integration_HostAddress}}/
+Accept: application/json
+
+###
