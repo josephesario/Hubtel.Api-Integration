@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35514.174 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hubtel.Api-Integration", "Hubtel.Api-Integration\Hubtel.Api-Integration.csproj", "{AED1DABD-013D-4CB3-9194-A34198C98022}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dbContex", "dbContex\dbContex.csproj", "{4D3A906B-6210-4C0B-AC72-EB06111C1046}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AED1DABD-013D-4CB3-9194-A34198C98022}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AED1DABD-013D-4CB3-9194-A34198C98022}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AED1DABD-013D-4CB3-9194-A34198C98022}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D3A906B-6210-4C0B-AC72-EB06111C1046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D3A906B-6210-4C0B-AC72-EB06111C1046}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D3A906B-6210-4C0B-AC72-EB06111C1046}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D3A906B-6210-4C0B-AC72-EB06111C1046}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
