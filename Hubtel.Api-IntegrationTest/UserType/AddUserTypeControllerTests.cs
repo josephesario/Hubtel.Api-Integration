@@ -12,15 +12,17 @@ using Hubtel.Api_Integration.Controllers;
 using ViewModel.Data;
 using ViewModel.Interfaces;
 using dbContex.Models;
+using Microsoft.Extensions.Options;
+using Castle.Core.Configuration;
 
-namespace Hubtel.Api_Integration.Tests
+namespace Hubtel.Api_IntegrationTest.UserType
 {
-    public class UserTypeControllerTests
+    public class AddUserTypeControllerTests
     {
         private readonly HubtelWalletDbContextExtended _context;
         private readonly UserTypeController _controller;
 
-        public UserTypeControllerTests()
+        public AddUserTypeControllerTests()
         {
             // Create a new in-memory configuration
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
@@ -36,6 +38,9 @@ namespace Hubtel.Api_Integration.Tests
             _context.Database.EnsureCreated(); // Create the database schema
             _controller = new UserTypeController(_context);
         }
+
+
+        #region AddUserType
 
         [Fact]
         public async Task AddUserType_NullUserType_ReturnsBadRequest()
@@ -187,5 +192,10 @@ namespace Hubtel.Api_Integration.Tests
             Assert.Equal(StatusCodes.Status500InternalServerError, apiResponse.StatusCode);
             Assert.Contains("An unexpected error occurred", apiResponse.Message);
         }
+
+        #endregion
+
+
+
     }
 }

@@ -11,5 +11,10 @@ namespace ViewModel.Interfaces
         public string? Name { get; set; }
 
     }
+    public interface IUserTypeRepository
+    {
+        Task<List<IUserType>> GetAllUserTypesAsync();
+    }
+
 
 }
