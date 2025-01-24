@@ -58,6 +58,8 @@ CREATE TABLE t_CardType(
    CreatedAt DateTime  null default GETDATE(),
 );
 
+go
+
 CREATE TABLE t_SimcardType(
 
    ID uniqueidentifier primary key default newId(),

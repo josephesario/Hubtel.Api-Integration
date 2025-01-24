@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dbContex", "dbContex\dbCont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModel", "ViewModel\ViewModel.csproj", "{EABFBB93-E381-4FDF-91C2-B4EA853A3DD9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helper", "Helper\Helper.csproj", "{62AE6F01-EC37-4C68-A6EA-C2500DEB6103}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{EABFBB93-E381-4FDF-91C2-B4EA853A3DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EABFBB93-E381-4FDF-91C2-B4EA853A3DD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EABFBB93-E381-4FDF-91C2-B4EA853A3DD9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62AE6F01-EC37-4C68-A6EA-C2500DEB6103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62AE6F01-EC37-4C68-A6EA-C2500DEB6103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62AE6F01-EC37-4C68-A6EA-C2500DEB6103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62AE6F01-EC37-4C68-A6EA-C2500DEB6103}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
