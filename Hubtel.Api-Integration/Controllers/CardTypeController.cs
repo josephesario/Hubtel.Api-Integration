@@ -7,100 +7,84 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
-    #region AccessController
     [ApiController]
     [Route("api/[controller]")]
-    public class UserTypeController : ControllerBase
+    public class CardTypeController : ControllerBase
     {
-
         private readonly HubtelWalletDbContextExtended _context;
 
-        public UserTypeController(HubtelWalletDbContextExtended context)
+        public CardTypeController(HubtelWalletDbContextExtended context)
         {
             _context = context;
         }
 
-        #region AddUserType
-        [HttpPost("AddUserType")]
-        [ProducesResponseType(typeof(ApiResponse<IUserType>), StatusCodes.Status200OK)]
+
+        #region AddCardType
+        [HttpPost("AddCardType")]
+        [ProducesResponseType(typeof(ApiResponse<ICardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddUserType([Required][FromBody] IUserType userType)
+        public async Task<IActionResult> AddCardType([Required][FromBody] ICardType cardType)
         {
             try
             {
-                if (userType == null || string.IsNullOrWhiteSpace(userType.Name))
+                if (cardType == null || string.IsNullOrWhiteSpace(cardType.Name))
                 {
                     return BadRequest(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "Invalid user type data",
+                        Message = "Invalid Card type data",
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Errors = new[] { "User type name is required" }
+                        Errors = new[] { "Card type name is required" }
                     });
                 }
 
-                // Validate that the user type is either "momo" or "card"
-                var allowedUserTypes = new[] { "momo", "card" };
-                if (!allowedUserTypes.Contains(userType.Name.ToLower()))
+                var allowedCardTypes = new[] { "visa", "master card" };
+                if (!allowedCardTypes.Contains(cardType.Name.ToLower()))
                 {
                     return BadRequest(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "Invalid user type",
+                        Message = "Invalid card type",
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Errors = new[] { "User type must be either 'momo' or 'card'" }
+                        Errors = new[] { "Card must be either 'visa' or 'master card'" }
                     });
                 }
 
-                var userTypeExists = await _context.TUserTypes!
-                    .AnyAsync(e => e.Name!.ToLower() == userType.Name!.ToLower(), default);
+                var cardTypeExists = await _context.TCardTypes!
+                    .AnyAsync(e => e.Name!.ToLower() == cardType.Name!.ToLower(), default);
 
-                if (userTypeExists)
+                if (cardTypeExists)
                 {
                     return Conflict(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type already exists",
+                        Message = "Card type already exists",
                         StatusCode = StatusCodes.Status409Conflict,
-                        Errors = new[] { $"A user type with name '{userType.Name}' already exists" }
+                        Errors = new[] { $"A card type with name '{cardType.Name}' already exists" }
                     });
                 }
 
-                var userTypeEntity = new TUserType
+                var cardTypeEntity = new TCardType
                 {
-                    Name = userType.Name,
+                    Name = cardType.Name,
                     CreatedAt = DateTime.UtcNow,
                 };
 
-                await _context.TUserTypes!.AddAsync(userTypeEntity);
+                await _context.TCardTypes!.AddAsync(cardTypeEntity);
                 await _context.SaveChangesAsync();
 
-                return Ok(new ApiResponse<TUserType>
+                return Ok(new ApiResponse<TCardType>
                 {
                     Success = true,
-                    Message = "User Type Added Successfully",
+                    Message = "Card Type Added Successfully",
                     StatusCode = StatusCodes.Status200OK,
-                    Data = userTypeEntity
-                });
-            }
-            catch (DbUpdateException ex)
-            {
-                Console.WriteLine("DbUpdateException caught: " + ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
-                {
-                    Success = false,
-                    Message = "An unexpected error occurred",
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Errors = new[] { ex.InnerException?.Message ?? ex.Message }
+                    Data = cardTypeEntity
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine("General Exception caught: " + ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
                 {
                     Success = false,
@@ -112,95 +96,58 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
 
-        #region GetUserType
-        [HttpPost("GetUserTypeByName")]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+
+        #region GetCardType
+        [HttpGet("GetCardTypeByName")]
+        [ProducesResponseType(typeof(ApiResponse<TCardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserType([FromHeader][Required] string Name)
+        public async Task<IActionResult> GetCardTypeByName([FromHeader][Required] string Name)
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Invalid user type data",
+                    Message = "Invalid Card type data",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type name is required" }
+                    Errors = new[] { "Card type name is required" }
                 });
             }
 
             Name = Name.ToLower();
-            if (Name != "momo" && Name != "card")
+            var allowedCardTypes = new[] { "visa", "master card" };
+            if (!allowedCardTypes.Contains(Name))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Invalid user type",
+                    Message = "Invalid Card type",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type must be either 'momo' or 'card'" }
+                    Errors = new[] { "Card type must be either 'visa' or 'master card'" }
                 });
             }
 
             try
             {
-                var userType = await _context.TUserTypes!
+                var cardType = await _context.TCardTypes!
                     .FirstOrDefaultAsync(e => e.Name!.ToLower() == Name);
 
-                return userType == null
+                return cardType == null
                     ? NotFound(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type not found",
+                        Message = "Card type not found",
                         StatusCode = StatusCodes.Status404NotFound,
-                        Errors = new[] { $"User type with name '{Name}' not found" }
+                        Errors = new[] { $"Card type with name '{Name}' not found" }
                     })
-                    : Ok(new ApiResponse<TUserType>
+                    : Ok(new ApiResponse<TCardType>
                     {
                         Success = true,
-                        Message = "User Type Found",
+                        Message = "Card Type Found",
                         StatusCode = StatusCodes.Status200OK,
-                        Data = userType
-                    });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
-                {
-                    Success = false,
-                    Message = "An unexpected error occurred",
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Errors = new[] { ex.Message }
-                });
-            }
-        }
-        #endregion
-
-        #region GetAllUserTypes
-        [HttpGet("GetAllUserTypes")]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<TUserType>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllUserTypes()
-        {
-            try
-            {
-                var userTypes = await _context.TUserTypes!.ToListAsync();
-                return userTypes.Count == 0
-                    ? NotFound(new ApiResponse<string>
-                    {
-                        Success = false,
-                        Message = "No user types found",
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Errors = new[] { "No user types found" }
-                    })
-                    : Ok(new ApiResponse<IEnumerable<TUserType>>
-                    {
-                        Success = true,
-                        Message = "User Types Found",
-                        StatusCode = StatusCodes.Status200OK,
-                        Data = userTypes
+                        Data = cardType
                     });
             }
             catch (Exception ex)
@@ -217,74 +164,114 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
 
-        #region DeleteUserType
-        [HttpDelete("DeleteUserType")]
+        #region GetAllCardTypes
+        [HttpGet("GetAllCardTypes")]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<TCardType>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAllCardTypes()
+        {
+            try
+            {
+                var cardTypes = await _context.TCardTypes!.ToListAsync();
+                return cardTypes.Count == 0
+                    ? NotFound(new ApiResponse<string>
+                    {
+                        Success = false,
+                        Message = "No card types found",
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Errors = new[] { "No card types found" }
+                    })
+                    : Ok(new ApiResponse<IEnumerable<TCardType>>
+                    {
+                        Success = true,
+                        Message = "Card Types Found",
+                        StatusCode = StatusCodes.Status200OK,
+                        Data = cardTypes
+                    });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "An unexpected error occurred",
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Errors = new[] { ex.Message }
+                });
+            }
+        }
+        #endregion
+
+        #region DeleteCardType
+        [HttpDelete("DeleteCardType")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteUserType([FromHeader][Required] string Name)
+        public async Task<IActionResult> DeleteCardType([FromHeader][Required] string Name)
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Invalid user type data",
+                    Message = "Invalid card type data",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type name is required" }
+                    Errors = new[] { "Card type name is required" }
                 });
             }
+
             Name = Name.ToLower();
-            if (Name != "momo" && Name != "card")
+            var allowedCardTypes = new[] { "visa", "master card" };
+            if (!allowedCardTypes.Contains(Name))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Invalid user type",
+                    Message = "Invalid card type",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type must be either 'momo' or 'card'" }
+                    Errors = new[] { "Card type must be either 'visa' or 'master card'" }
                 });
             }
 
             try
             {
-                var userType = await _context.TUserTypes!
+                var cardType = await _context.TCardTypes!
                     .FirstOrDefaultAsync(e => e.Name!.ToLower() == Name);
-                if (userType == null)
+
+                if (cardType == null)
                 {
                     return NotFound(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type not found",
+                        Message = "Card type not found",
                         StatusCode = StatusCodes.Status404NotFound,
-                        Errors = new[] { $"User type with name '{Name}' not found" }
+                        Errors = new[] { $"Card type with name '{Name}' not found" }
                     });
                 }
 
-                if(await _context.TUserAccesses!.AnyAsync(e => e.UserTypeId == userType.Id))
+                // Check for dependent data if needed
+                if (await _context.TCardAccountDetails!.AnyAsync(e => e.CardTypeId == cardType.Id))
                 {
                     return BadRequest(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type has dependent data",
+                        Message = "Card type has dependent data",
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Errors = new[] { $"User type with name '{Name}' has dependent data" }
+                        Errors = new[] { $"Card type with name '{Name}' has dependent data" }
                     });
                 }
 
-
-                _context.TUserTypes!.Remove(userType);
-
-
+                _context.TCardTypes!.Remove(cardType);
                 await _context.SaveChangesAsync();
+
                 return Ok(new ApiResponse<string>
                 {
                     Success = true,
-                    Message = "User Type Deleted Successfully",
+                    Message = "Card Type Deleted Successfully",
                     StatusCode = StatusCodes.Status200OK
                 });
-
             }
             catch (Exception ex)
             {
@@ -299,6 +286,4 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
     }
-    #endregion
-
 }

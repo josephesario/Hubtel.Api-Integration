@@ -52,7 +52,7 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.FullName);
 
     // Add custom SchemaFilter
-    options.SchemaFilter<ExcludeSchemaFilter>();
+    //options.SchemaFilter<ExcludeSchemaFilter>();
 });
 
 // Add CORS
