@@ -25,7 +25,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Hubtel Wallet Api",
         Version = "v1",
-        Description = "API for managing merchant transactions and locations"
+        Description = "API for managing Hubtel Wallet"
     });
 
     var securityScheme = new OpenApiSecurityScheme
@@ -107,7 +107,7 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Merchant Trace API V1");
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Hubtel Wallet Api");
         options.RoutePrefix = "swagger";
         // Additional UI settings
         options.EnableDeepLinking();

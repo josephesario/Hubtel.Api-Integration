@@ -216,6 +216,8 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
 
+
+        #region DeleteUserType
         [HttpDelete("DeleteUserType")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -244,6 +246,7 @@ namespace Hubtel.Api_Integration.Controllers
                     Errors = new[] { "User type must be either 'momo' or 'card'" }
                 });
             }
+
             try
             {
                 var userType = await _context.TUserTypes!
@@ -294,6 +297,7 @@ namespace Hubtel.Api_Integration.Controllers
                 });
             }
         }
+        #endregion
     }
     #endregion
 
