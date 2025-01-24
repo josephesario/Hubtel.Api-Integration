@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Helper\Helper.csproj" />
+    <ProjectReference Include="..\ViewModel\ViewModel.csproj" />
   </ItemGroup>
 
 </Project>

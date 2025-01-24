@@ -1,12 +1,22 @@
 using System.Text;
+using dbContex.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ViewModel.Interfaces;
 using Microsoft.OpenApi.Models;
 
+
 var builder = WebApplication.CreateBuilder(args);
+ 
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new InterfaceConverterFactory());
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 
@@ -64,17 +74,23 @@ builder.Services.AddCors(options =>
 });
 
 
+
+
+builder.Services.AddDbContext<HubtelWalletDbContextExtended>(options =>
+    options.UseSqlServer(configuration.GetConnectionString("HubtelWalletDbContextExtended")));
+
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
+            ValidateIssuer   =   true,
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtIssuer,
-            ValidAudience = jwtIssuer,
+            ValidIssuer =      jwtIssuer,
+            ValidAudience =    jwtIssuer,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
