@@ -89,7 +89,7 @@ public partial class HubtelWalletDbContextExtended : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name)
-                .HasMaxLength(4)
+                .HasMaxLength(11)
                 .IsUnicode(false)
                 .IsFixedLength();
         });

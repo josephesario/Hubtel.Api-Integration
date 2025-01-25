@@ -23,7 +23,7 @@ namespace Helper.secure
             _context = dbContext;
         }
 
-        public async Task<Dictionary<string, string>> GenerateJwtToken(TUserAccess user, Guid userTypeId, string userDetailsId, string registrationId)
+        public async Task<Dictionary<string, string>> GenerateJwtToken(TUserAccess user, Guid userTypeId, string userDetailsId, string emailphone)
         {
             var tokens = new Dictionary<string, string>();
 
@@ -36,7 +36,6 @@ namespace Helper.secure
                 if (string.IsNullOrWhiteSpace(keyBytesFromJson) || string.IsNullOrWhiteSpace(ivBytesFromJson))
                 {
                     tokens.Add("accessToken", "Encryption keys not available!");
-                    tokens.Add("refreshToken", "JnF Error");
                     return tokens;
                 }
 
@@ -58,25 +57,20 @@ namespace Helper.secure
                     if (issuer != null)
                     {
 
-                        var accessToken = CreateToken(issuer, decryptedSystemAccess, systemUserType.Name!, user.Id.ToString(), creds, DateTime.Now.AddHours(2));
-
-                        var refreshToken = CreateToken(issuer, decryptedSystemAccess, systemUserType.Name!, user.Id.ToString(), creds, DateTime.Now.AddHours(816));
+                        var accessToken = CreateToken(issuer, decryptedSystemAccess, emailphone, user.Id.ToString(), creds, DateTime.Now.AddHours(2));
 
                         tokens.Add("accessToken", new JwtSecurityTokenHandler().WriteToken(accessToken));
-                        tokens.Add("refreshToken", new JwtSecurityTokenHandler().WriteToken(refreshToken));
 
                         return tokens;
                     }
                 }
 
                 tokens.Add("accessToken", "Error generating tokens!");
-                tokens.Add("refreshToken", "Error generating tokens!");
                 return tokens;
             }
             catch (Exception ex)
             {
                 tokens.Add("accessToken", $"Error: {ex.Message}");
-                tokens.Add("refreshToken", string.Empty);
                 return tokens;
             }
         }

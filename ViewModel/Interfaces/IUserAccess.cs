@@ -13,6 +13,8 @@ namespace ViewModel.Interfaces
 
         public string? UserSecret { get; set; }
 
+        public string UserType { get; set; }
+
     }
 
 }

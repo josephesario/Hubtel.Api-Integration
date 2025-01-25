@@ -54,7 +54,7 @@ go
 CREATE TABLE t_CardType(
 
    ID uniqueidentifier primary key default newId(),
-   [Name] Char(4) check ([Name] IN ('VISA','MASTER CARD')) unique,
+   [Name] Char(11) check ([Name] IN ('VISA','MASTER CARD')) unique,
    CreatedAt DateTime  null default GETDATE(),
 );
 

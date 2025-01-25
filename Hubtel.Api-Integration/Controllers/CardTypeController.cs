@@ -2,8 +2,10 @@
 using dbContex.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using ViewModel.Data;
 using ViewModel.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Hubtel.Api_Integration.Controllers
 {
@@ -99,7 +101,7 @@ namespace Hubtel.Api_Integration.Controllers
 
         #region GetCardType
         [HttpGet("GetCardTypeByName")]
-        [ProducesResponseType(typeof(ApiResponse<TCardType>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<CardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
@@ -142,12 +144,13 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status404NotFound,
                         Errors = new[] { $"Card type with name '{Name}' not found" }
                     })
-                    : Ok(new ApiResponse<TCardType>
+                    : Ok(new ApiResponse<CardType>
                     {
                         Success = true,
                         Message = "Card Type Found",
                         StatusCode = StatusCodes.Status200OK,
-                        Data = cardType
+                        Data = new CardType() { Name = cardType.Name}
+
                     });
             }
             catch (Exception ex)
@@ -166,7 +169,7 @@ namespace Hubtel.Api_Integration.Controllers
 
         #region GetAllCardTypes
         [HttpGet("GetAllCardTypes")]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<TCardType>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<ICardType>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllCardTypes()
@@ -174,6 +177,7 @@ namespace Hubtel.Api_Integration.Controllers
             try
             {
                 var cardTypes = await _context.TCardTypes!.ToListAsync();
+
                 return cardTypes.Count == 0
                     ? NotFound(new ApiResponse<string>
                     {
@@ -182,13 +186,14 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status404NotFound,
                         Errors = new[] { "No card types found" }
                     })
-                    : Ok(new ApiResponse<IEnumerable<TCardType>>
+                    : Ok(new ApiResponse<IEnumerable<ICardType>> // Using DTO here
                     {
                         Success = true,
                         Message = "Card Types Found",
                         StatusCode = StatusCodes.Status200OK,
-                        Data = cardTypes
+                        Data = cardTypes.Select(c => new CardType { Name = c.Name }).ToList() // Projecting to DTO
                     });
+
             }
             catch (Exception ex)
             {
@@ -270,7 +275,8 @@ namespace Hubtel.Api_Integration.Controllers
                 {
                     Success = true,
                     Message = "Card Type Deleted Successfully",
-                    StatusCode = StatusCodes.Status200OK
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = $"Card Type {cardType.Name} Deleted Successfully!"
                 });
             }
             catch (Exception ex)

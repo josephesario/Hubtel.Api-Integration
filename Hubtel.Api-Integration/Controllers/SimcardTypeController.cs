@@ -7,99 +7,83 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
-    #region AccessController
-    [ApiController]
     [Route("api/[controller]")]
-    public class UserTypeController : ControllerBase
+    [ApiController]
+    public class SimcardTypeController : Controller
     {
-
         private readonly HubtelWalletDbContextExtended _context;
 
-        public UserTypeController(HubtelWalletDbContextExtended context)
+        public SimcardTypeController(HubtelWalletDbContextExtended context)
         {
             _context = context;
         }
 
-        #region AddUserType
-        [HttpPost("AddUserType")]
-        [ProducesResponseType(typeof(ApiResponse<IUserType>), StatusCodes.Status200OK)]
+        #region AddSimType
+        [HttpPost("AddSimType")]
+        [ProducesResponseType(typeof(ApiResponse<ISimcardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddUserType([Required][FromBody] IUserType userType)
+        public async Task<IActionResult> AddSimType([Required][FromBody] ISimcardType simType)
         {
             try
             {
-                if (userType == null || string.IsNullOrWhiteSpace(userType.Name))
+                if (simType == null || string.IsNullOrWhiteSpace(simType.Name))
                 {
                     return BadRequest(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "Invalid user type data",
+                        Message = "Invalid SIM type data",
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Errors = new[] { "User type name is required" }
+                        Errors = new[] { "SIM type name is required" }
                     });
                 }
 
-                // Validate that the user type is either "momo" or "card"
-                var allowedUserTypes = new[] { "momo", "card" };
-                if (!allowedUserTypes.Contains(userType.Name.ToLower()))
+                var allowedSimTypes = new[] { "vodafone", "mtn", "airteltigo" };
+                if (!allowedSimTypes.Contains(simType.Name.ToLower()))
                 {
                     return BadRequest(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "Invalid user type",
+                        Message = "Invalid SIM type",
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Errors = new[] { "User type must be either 'momo' or 'card'" }
+                        Errors = new[] { "SIM type must be 'vodafone', 'mtn', or 'airteltigo'" }
                     });
                 }
 
-                var userTypeExists = await _context.TUserTypes!
-                    .AnyAsync(e => e.Name!.ToLower() == userType.Name!.ToLower(), default);
+                var simTypeExists = await _context.TSimcardTypes!
+                    .AnyAsync(e => e.Name!.ToLower() == simType.Name!.ToLower());
 
-                if (userTypeExists)
+                if (simTypeExists)
                 {
                     return Conflict(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type already exists",
+                        Message = "SIM type already exists",
                         StatusCode = StatusCodes.Status409Conflict,
-                        Errors = new[] { $"A user type with name '{userType.Name}' already exists" }
+                        Errors = new[] { $"A SIM type with name '{simType.Name}' already exists" }
                     });
                 }
 
-                var userTypeEntity = new TUserType
+                var simTypeEntity = new TSimcardType
                 {
-                    Name = userType.Name,
+                    Name = simType.Name,
                     CreatedAt = DateTime.UtcNow,
                 };
 
-                await _context.TUserTypes!.AddAsync(userTypeEntity);
+                await _context.TSimcardTypes!.AddAsync(simTypeEntity);
                 await _context.SaveChangesAsync();
 
-                return Ok(new ApiResponse<TUserType>
+                return Ok(new ApiResponse<TSimcardType>
                 {
                     Success = true,
-                    Message = "User Type Added Successfully",
+                    Message = "SIM Type Added Successfully",
                     StatusCode = StatusCodes.Status200OK,
-                    Data = userTypeEntity
-                });
-            }
-            catch (DbUpdateException ex)
-            {
-                Console.WriteLine("DbUpdateException caught: " + ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
-                {
-                    Success = false,
-                    Message = "An unexpected error occurred",
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Errors = new[] { ex.InnerException?.Message ?? ex.Message }
+                    Data = simTypeEntity
                 });
             }
             catch (Exception ex)
             {
-                Console.WriteLine("General Exception caught: " + ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
                 {
                     Success = false,
@@ -111,56 +95,57 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
 
-        #region GetUserType
-        [HttpGet("GetUserTypeByName")]
-        [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+        #region GetSimTypeByName
+        [HttpGet("GetSimTypeByName")]
+        [ProducesResponseType(typeof(ApiResponse<SimcardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserType([FromHeader][Required] string Name)
+        public async Task<IActionResult> GetSimTypeByName([FromHeader][Required] string name)
         {
-            if (string.IsNullOrWhiteSpace(Name))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Invalid user type data",
+                    Message = "Invalid SIM type data",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type name is required" }
+                    Errors = new[] { "SIM type name is required" }
                 });
             }
 
-            Name = Name.ToLower();
-            if (Name != "momo" && Name != "card")
+            name = name.ToLower();
+            var allowedSimTypes = new[] { "vodafone", "mtn", "airteltigo" };
+            if (!allowedSimTypes.Contains(name))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Invalid user type",
+                    Message = "Invalid SIM type",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type must be either 'momo' or 'card'" }
+                    Errors = new[] { "SIM type must be 'vodafone', 'mtn', or 'airteltigo'" }
                 });
             }
 
             try
             {
-                var userType = await _context.TUserTypes!
-                    .FirstOrDefaultAsync(e => e.Name!.ToLower() == Name);
+                var simType = await _context.TSimcardTypes!
+                    .FirstOrDefaultAsync(e => e.Name!.ToLower() == name);
 
-                return userType == null
+                return simType == null
                     ? NotFound(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type not found",
+                        Message = "SIM type not found",
                         StatusCode = StatusCodes.Status404NotFound,
-                        Errors = new[] { $"User type with name '{Name}' not found" }
+                        Errors = new[] { $"SIM type with name '{name}' not found" }
                     })
-                    : Ok(new ApiResponse<TUserType>
+                    : Ok(new ApiResponse<SimcardType>
                     {
                         Success = true,
-                        Message = "User Type Found",
+                        Message = "SIM Type Found",
                         StatusCode = StatusCodes.Status200OK,
-                        Data = userType
+                        Data = new SimcardType() { Name = simType.Name }
                     });
             }
             catch (Exception ex)
@@ -176,30 +161,31 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
 
-        #region GetAllUserTypes
-        [HttpGet("GetAllUserTypes")]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<TUserType>>), StatusCodes.Status200OK)]
+        #region GetAllSimTypes
+        [HttpGet("GetAllSimTypes")]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<ISimcardType>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllUserTypes()
+        public async Task<IActionResult> GetAllSimTypes()
         {
             try
             {
-                var userTypes = await _context.TUserTypes!.ToListAsync();
-                return userTypes.Count == 0
+                var simTypes = await _context.TSimcardTypes!.ToListAsync();
+
+                return simTypes.Count == 0
                     ? NotFound(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "No user types found",
+                        Message = "No SIM types found",
                         StatusCode = StatusCodes.Status404NotFound,
-                        Errors = new[] { "No user types found" }
+                        Errors = new[] { "No data available" }
                     })
-                    : Ok(new ApiResponse<IEnumerable<TUserType>>
+                    : Ok(new ApiResponse<IEnumerable<ISimcardType>>
                     {
                         Success = true,
-                        Message = "User Types Found",
+                        Message = "SIM Types Found",
                         StatusCode = StatusCodes.Status200OK,
-                        Data = userTypes
+                        Data = simTypes.Select(sim => new SimcardType { Name = sim.Name })
                     });
             }
             catch (Exception ex)
@@ -215,75 +201,68 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
 
-
-        #region DeleteUserType
-        [HttpDelete("DeleteUserType")]
+        #region DeleteSimType
+        [HttpDelete("DeleteSimType")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteUserType([FromHeader][Required] string Name)
+        public async Task<IActionResult> DeleteSimType([FromHeader][Required] string name)
         {
-            if (string.IsNullOrWhiteSpace(Name))
+            if (string.IsNullOrWhiteSpace(name))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Invalid user type data",
+                    Message = "Invalid SIM type data",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type name is required" }
-                });
-            }
-            Name = Name.ToLower();
-            if (Name != "momo" && Name != "card")
-            {
-                return BadRequest(new ApiResponse<string>
-                {
-                    Success = false,
-                    Message = "Invalid user type",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User type must be either 'momo' or 'card'" }
+                    Errors = new[] { "SIM type name is required" }
                 });
             }
 
+            name = name.ToLower();
+
             try
             {
-                var userType = await _context.TUserTypes!
-                    .FirstOrDefaultAsync(e => e.Name!.ToLower() == Name);
-                if (userType == null)
+
+                var simType = await _context.TSimcardTypes!
+                    .FirstOrDefaultAsync(e => e.Name!.ToLower() == name);
+
+                if (simType == null)
                 {
                     return NotFound(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type not found",
+                        Message = "SIM type not found",
                         StatusCode = StatusCodes.Status404NotFound,
-                        Errors = new[] { $"User type with name '{Name}' not found" }
+                        Errors = new[] { $"SIM type with name '{name}' not found" }
                     });
                 }
 
-                if(await _context.TUserAccesses!.AnyAsync(e => e.UserTypeId == userType.Id))
+                var hasDependents = await _context.TPhoneAccountDetails!
+                    .AnyAsync(e => e.SimCardTypeId == simType.Id); 
+
+                if (hasDependents)
                 {
                     return BadRequest(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "User type has dependent data",
+                        Message = "Cannot delete SIM type because it has dependent records",
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Errors = new[] { $"User type with name '{Name}' has dependent data" }
+                        Errors = new[] { $"SIM type '{name}' is referenced in other records and cannot be deleted" }
                     });
                 }
 
-
-                _context.TUserTypes!.Remove(userType);
-
-
+                _context.TSimcardTypes!.Remove(simType);
                 await _context.SaveChangesAsync();
+
                 return Ok(new ApiResponse<string>
                 {
                     Success = true,
-                    Message = "User Type Deleted Successfully",
-                    StatusCode = StatusCodes.Status200OK
+                    Message = "SIM Type Deleted Successfully",
+                    StatusCode = StatusCodes.Status200OK,
+                    Data = $"SIM type '{name}' has been deleted successfully"
                 });
-
             }
             catch (Exception ex)
             {
@@ -297,7 +276,6 @@ namespace Hubtel.Api_Integration.Controllers
             }
         }
         #endregion
-    }
-    #endregion
 
+    }
 }

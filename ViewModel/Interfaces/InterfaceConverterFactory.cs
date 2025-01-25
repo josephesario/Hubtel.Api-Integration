@@ -21,7 +21,8 @@ namespace ViewModel.Interfaces
         { typeof(ICardAccountDetail), typeof(CardAccountDetail) },
         { typeof(ICardAccountDetailOut), typeof(CardAccountDetailOut) },
         { typeof(IPhoneAccountDetail), typeof(PhoneAccountDetail) },
-        { typeof(IPhoneAccountDetailOut), typeof(PhoneAccountDetailOut) }
+        { typeof(IPhoneAccountDetailOut), typeof(PhoneAccountDetailOut) },
+        { typeof(ILogin), typeof(Login) }
     };
 
         public override bool CanConvert(Type typeToConvert) =>
