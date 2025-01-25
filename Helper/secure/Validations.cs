@@ -96,6 +96,26 @@ namespace Helper.secure
             }
         }
 
+      
+        public static bool ValidateGhanaID(string idNumber)
+        {
+            if (string.IsNullOrWhiteSpace(idNumber))
+            {
+                return false;
+            }
+
+            Regex IdFormat = new Regex(@"^[Gg][Hh][Aa]-\d{9}-\d$", RegexOptions.Compiled);
+
+            if (!IdFormat.IsMatch(idNumber))
+            {
+                return false;
+            }
+
+            string numericPart = idNumber.Replace("Gha-", "", StringComparison.OrdinalIgnoreCase).Replace("-", "");
+            return true;
+        }
+
+
         private static void HandleValidationException(Exception ex)
         {
             Console.WriteLine($"Validation Error: {ex.Message}");

@@ -43,7 +43,7 @@ CREATE TABLE t_UserProfile(
    LegalName VARCHAR(120)  unique not null,
    IdentityCardNumber varchar(20) unique not null,
    CreatedAt DateTime  null default GETDATE(),
-   PhoneNumber VARCHAR(15)  unique not null,
+   EmailPhone VARCHAR(120)  unique not null,
    
    Constraint[fk_t_UserAccess_And_t_UserProfile] foreign key (UserAccessID) references t_UserAccess(ID)
 
@@ -58,12 +58,10 @@ CREATE TABLE t_CardType(
    CreatedAt DateTime  null default GETDATE(),
 );
 
-go
-
 CREATE TABLE t_SimcardType(
 
    ID uniqueidentifier primary key default newId(),
-   [Name] Char(9) check ([Name] IN ('vodafone','mtn','airteltigo')) unique,
+   [Name] Char(10) check ([Name] IN ('vodafone','mtn','airteltigo')) unique,
    CreatedAt DateTime  null default GETDATE(),
 );
 

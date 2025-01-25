@@ -13,7 +13,7 @@ namespace ViewModel.Interfaces
 
         public string IdentityCardNumber { get; set; }
 
-        public string PhoneNumber { get; set; } 
+        public string EmailPhone { get; set; } 
 
     }
 }

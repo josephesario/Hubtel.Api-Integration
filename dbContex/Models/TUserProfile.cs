@@ -15,7 +15,7 @@ public partial class TUserProfile
 
     public DateTime? CreatedAt { get; set; }
 
-    public string PhoneNumber { get; set; } = null!;
+    public string EmailPhone { get; set; } = null!;
 
     public virtual ICollection<TCardAccountDetail> TCardAccountDetails { get; set; } = new List<TCardAccountDetail>();
 

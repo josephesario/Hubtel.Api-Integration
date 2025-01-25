@@ -146,7 +146,7 @@ public partial class HubtelWalletDbContextExtended : DbContext
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.Name)
-                .HasMaxLength(9)
+                .HasMaxLength(10)
                 .IsUnicode(false)
                 .IsFixedLength();
         });
@@ -190,7 +190,7 @@ public partial class HubtelWalletDbContextExtended : DbContext
 
             entity.HasIndex(e => e.IdentityCardNumber, "UQ__t_UserPr__59CD512115EEBE64").IsUnique();
 
-            entity.HasIndex(e => e.PhoneNumber, "UQ__t_UserPr__85FB4E38C02B8134").IsUnique();
+            entity.HasIndex(e => e.EmailPhone, "UQ__t_UserPr__85FB4E38C02B8134").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -204,8 +204,8 @@ public partial class HubtelWalletDbContextExtended : DbContext
             entity.Property(e => e.LegalName)
                 .HasMaxLength(120)
                 .IsUnicode(false);
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(15)
+            entity.Property(e => e.EmailPhone)
+                .HasMaxLength(120)
                 .IsUnicode(false);
             entity.Property(e => e.UserAccessId).HasColumnName("UserAccessID");
 
