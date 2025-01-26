@@ -55,7 +55,7 @@ Before setting up this project, ensure you have the following installed:
 ### SQL SERVER DB IMAGE
 ![image](https://github.com/user-attachments/assets/40d72b6a-fbce-4873-8b00-1fa8d8c939d6)
 
-SSQML  [Hubtel.com]([DATABASE](https://github.com/josephesario/Hubtel.Api-Integration/blob/master/Hubtel.Api-Integration/Hubtel_WalletDb.sql)
+[HUBTEL INTERVIEW QUESTION]([DATABASE](https://github.com/josephesario/Hubtel.Api-Integration/blob/master/Hubtel.Api-Integration/Hubtel_WalletDb.sql))
 
 -
 
