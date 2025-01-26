@@ -182,6 +182,7 @@ namespace Hubtel.Api_Integration.Controllers
                         if (cardType != null) 
                         { 
                             cardNumber = model.AccountNumber!.Substring(0, 6);
+                            model.AccountNumber = cardNumber;
                             squemaCardId = _context.TCardTypes!.FirstOrDefault(x => x.Name == model.AccountScheme)!.Id.ToString();
                         }
                         else
@@ -218,6 +219,7 @@ namespace Hubtel.Api_Integration.Controllers
                             if (simType != null)
                             {
                                 cardNumber = model.AccountNumber;
+
                                 var outputResult = _context.TSimcardTypes!.FirstOrDefault(x => x.Name == model.AccountScheme)!.Id.ToString();
                                 if (outputResult==null)
                                 {
