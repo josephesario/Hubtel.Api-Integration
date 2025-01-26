@@ -10,6 +10,9 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
+    /// <summary>
+    /// UserProfileController
+    /// </summary>
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
@@ -18,6 +21,11 @@ namespace Hubtel.Api_Integration.Controllers
         private readonly HubtelWalletDbContext _context;
         private readonly IConfiguration _configuration;
 
+        /// <summary>
+        ///  UserProfileController
+        /// </summary> 
+        /// <param name="context"></param>
+        /// <param name="configuration"></param>
         public UserProfileController(HubtelWalletDbContext context, IConfiguration configuration)
         {
             _context = context;
@@ -117,7 +125,7 @@ namespace Hubtel.Api_Integration.Controllers
                         Success = false,
                         Message = "User authenticated",
                         StatusCode = StatusCodes.Status401Unauthorized,
-                        Errors = new[] { "Make Sure To Provide Your Account Email Or Password" }
+                        Errors = new[] { "Make Sure To Provide Your Account Email Or Phone Number" }
                     });
 
                 }

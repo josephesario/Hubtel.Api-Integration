@@ -10,6 +10,9 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
+    /// <summary>
+    /// WalletAccountDetailController
+    /// </summary>
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
@@ -18,6 +21,11 @@ namespace Hubtel.Api_Integration.Controllers
         private readonly HubtelWalletDbContext _context;
         private readonly IConfiguration _configuration;
 
+        /// <summary>
+        ///  WalletAccountDetailController
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="configuration"></param>
         public WalletAccountDetailController(HubtelWalletDbContext context, IConfiguration configuration)
         {
             _context = context;
