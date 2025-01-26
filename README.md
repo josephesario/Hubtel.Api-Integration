@@ -47,6 +47,9 @@ Before setting up this project, ensure you have the following installed:
 ![Screenshot 2025-01-26 130500](https://github.com/user-attachments/assets/c01177a6-9033-4d5a-adaa-a708f3887bc2)
 ![Screenshot 2025-01-26 130510](https://github.com/user-attachments/assets/f5e97baa-e5ca-4227-9843-c9d9e93d7e9e)
 
+## SECRETS (only for the EncryptionKeys)
+![image](https://github.com/user-attachments/assets/394384c7-88b5-431c-9162-92329fd64a18)
+
 
 
 ### DATABASE SCHEMA!
