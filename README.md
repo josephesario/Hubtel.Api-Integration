@@ -52,6 +52,9 @@ Before setting up this project, ensure you have the following installed:
 ### DATABASE SCHEMA!
 ![image](https://github.com/user-attachments/assets/249021a0-a61c-4cd1-8ad0-c25cb51e8439)
 
+### SQL SERVER DB IMAGE
+![image](https://github.com/user-attachments/assets/40d72b6a-fbce-4873-8b00-1fa8d8c939d6)
+
 ### XUNIT TEST
 ![Screenshot 2025-01-26 130209](https://github.com/user-attachments/assets/378d16d3-a4ca-49fe-8ccf-a7c6cff912bb)
 
