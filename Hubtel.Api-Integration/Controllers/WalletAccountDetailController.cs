@@ -42,7 +42,8 @@ namespace Hubtel.Api_Integration.Controllers
                     {
                         Data = "Profile does not exist",
                         Message = "Profile does not exist",
-                        Success = false
+                        Success = false,
+                        StatusCode = StatusCodes.Status400BadRequest
                     });
                 }
 
@@ -53,7 +54,8 @@ namespace Hubtel.Api_Integration.Controllers
                     {
                         Data = "Account Number, Account Type and Card Type are required",
                         Message = "Account Number, Account Type and Card Type are required",
-                        Success = false
+                        Success = false,
+                        StatusCode = StatusCodes.Status400BadRequest
                     });
                 }
 
@@ -63,13 +65,11 @@ namespace Hubtel.Api_Integration.Controllers
                     {
                         Data = "Account Number is invalid",
                         Message = "Account Number Should Be either a phone number or a card",
-                        Success = false
+                        Success = false,
+                        StatusCode = StatusCodes.Status400BadRequest
                     });
 
                 }
-
-
-
 
 
                 var simType = _context.TSimcardTypes!.FirstOrDefault(x => x.Name == model.AccountScheme)?.Name;
@@ -125,10 +125,10 @@ namespace Hubtel.Api_Integration.Controllers
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
                     {
-                        Data = "You have reached the maximum number of accounts",
-                        Message = "You have reached the maximum number of accounts",
+                        Data = "You have reached the maximum number of (5) accounts",
+                        Message = "Maximum number of (5) accounts Reached",
                         Success = false,
-                        StatusCode = 400
+                        StatusCode = StatusCodes.Status400BadRequest
 
                     });
                 }
@@ -137,11 +137,12 @@ namespace Hubtel.Api_Integration.Controllers
                 var accountTypeExist = _context.TTypes!.FirstOrDefault(x => x.Name == AccountType);
                 if (accountTypeExist == null)
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
+                    return StatusCode(StatusCodes.Status404NotFound, new ApiResponse<string>
                     {
                         Data = "Account Type does not exist",
                         Message = "Account Type does not exist",
-                        Success = false
+                        Success = false,
+                        StatusCode = StatusCodes.Status404NotFound
                     });
                 }
 
@@ -284,37 +285,50 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
 
-        #region GetCardAccountDetail
-        [HttpGet]
+        #region AccountDetailByAccountNumber
+        [HttpGet("AccountDetailByAccountNumber")]
         [ProducesResponseType(typeof(ApiResponse<IWalletAccountDetail>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetCardAccountDetail([Required][FromQuery] string cardNumber)
+        public async Task<IActionResult> AccountDetailByAccountNumber([Required][FromQuery] string AccountNumber)
         {
             try
             {
-                var cardAccountDetail = await _context.TWalletAccountDetails!.FirstOrDefaultAsync(x => x.AccountNumber == cardNumber);
+                var cardAccountDetail = await _context.TWalletAccountDetails!.FirstOrDefaultAsync(x => x.AccountNumber == AccountNumber);
                 if (cardAccountDetail == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new ApiResponse<string>
                     {
-                        Data = "Card Account Detail does not exist",
-                        Message = "Card Account Detail does not exist",
-                        Success = false
+                        Data = "Account Not Found",
+                        Message = "Account Not Found",
+                        Success = false,
+                        StatusCode = StatusCodes.Status404NotFound
                     });
                 }
-                var cardType = _context.TCardTypes!.FirstOrDefault(x => x.Id == cardAccountDetail.CardTypeId);
+
+                var accountScheme = _context.TCardTypes?.FirstOrDefault(x => x.Id == cardAccountDetail.CardTypeId)?.Name
+                                    ?? _context.TSimcardTypes?.FirstOrDefault(x => x.Id == cardAccountDetail.SimCardTypeId)?.Name;
+
+                if (string.IsNullOrEmpty(accountScheme))
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
+                    {
+                        Success = false,
+                        Message = "Account Does Not Found",
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Errors = new[] { "No matching Account Number could be found for the given account" }
+                    });
+                }
+
                 var cardAccountDetailResponse = new WalletAccountDetail
                 {
                     AccountNumber = cardAccountDetail.AccountNumber,
-                    AccountScheme = cardType!.Name!,
-                    ProfileLegalName = _context.TUserProfiles!.FirstOrDefault(x => x.Id == cardAccountDetail.UserProfileId)!.LegalName
+                    AccountScheme = accountScheme,
+                    ProfileLegalName = _context.TUserProfiles?.FirstOrDefault(x => x.Id == cardAccountDetail.UserProfileId)?.LegalName!
                 };
 
-
                 var currentUserEmailPhone = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
-
                 var existingEmailPhone = await _context.TUserAccesses!.FirstOrDefaultAsync(x => x.EmailPhoneNumber == currentUserEmailPhone);
                 var existingEmail = await _context.TUserAccesses!.FirstOrDefaultAsync(x => x.Id == cardAccountDetail.UserAccessId);
 
@@ -327,15 +341,14 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status401Unauthorized,
                         Errors = new[] { "You Are Not Authorize To Perform This Operation" }
                     });
-
                 }
-
 
                 return StatusCode(StatusCodes.Status200OK, new ApiResponse<IWalletAccountDetail>
                 {
                     Data = cardAccountDetailResponse,
-                    Message = "Card Account Detail retrieved successfully",
-                    Success = true
+                    Message = "Account Detail retrieved successfully",
+                    Success = true,
+                    StatusCode = StatusCodes.Status200OK
                 });
             }
             catch (Exception ex)
@@ -344,7 +357,8 @@ namespace Hubtel.Api_Integration.Controllers
                 {
                     Data = ex.Message,
                     Message = "An error occurred while retrieving Card Account Detail",
-                    Success = false
+                    Success = false,
+                    StatusCode = StatusCodes.Status500InternalServerError
                 });
             }
         }
@@ -356,7 +370,7 @@ namespace Hubtel.Api_Integration.Controllers
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllCardAccountDetails()
+        public async Task<IActionResult> GetAllAccountDetails()
         {
             try
             {
@@ -374,6 +388,7 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
+
                 var userProfile = await _context.TUserProfiles!.FirstOrDefaultAsync(x => x.UserAccessId == existingUser.Id);
                 if (userProfile == null)
                 {
@@ -381,27 +396,33 @@ namespace Hubtel.Api_Integration.Controllers
                     {
                         Data = "User profile not found",
                         Message = "User profile not found",
-                        Success = false
+                        Success = false,
+                        StatusCode = StatusCodes.Status400BadRequest
                     });
                 }
 
+
                 var cardAccountDetails = await _context.TWalletAccountDetails!
                     .Where(x => x.UserProfileId == userProfile.Id)
-                    .Select(card => new WalletAccountDetail
+                    .Select(card => new WalletAccountDetailOut
                     {
                         AccountNumber = card.AccountNumber,
-                        AccountScheme = _context.TCardTypes!.FirstOrDefault(t => t.Id == card.CardTypeId)!.Name!,
-                        ProfileLegalName = userProfile.LegalName
+                        AccountScheme = (_context.TCardTypes!.FirstOrDefault(t => t.Id == card.CardTypeId)!.Name!) ?? (_context.TSimcardTypes!.FirstOrDefault(t => t.Id == card.SimCardTypeId)!.Name!),
+                        ProfileLegalName = userProfile.LegalName,
+                        AccountType = _context.TTypes!.FirstOrDefault(t => t.Id == card.AccountTypeId)!.Name!,
+                        CreatedAt = card.CreatedAt!.Value,
+
                     })
                     .ToListAsync();
 
 
 
-                return StatusCode(StatusCodes.Status200OK, new ApiResponse<List<WalletAccountDetail>>
+                return StatusCode(StatusCodes.Status200OK, new ApiResponse<List<WalletAccountDetailOut>>
                 {
                     Data = cardAccountDetails,
                     Message = "Card Account Details retrieved successfully",
-                    Success = true
+                    Success = true,
+                    StatusCode = StatusCodes.Status200OK
                 });
             }
             catch (Exception ex)
@@ -410,26 +431,27 @@ namespace Hubtel.Api_Integration.Controllers
                 {
                     Data = ex.Message,
                     Message = "An error occurred while retrieving Card Account Details",
-                    Success = false
+                    Success = false,
+                    StatusCode = StatusCodes.Status500InternalServerError
                 });
             }
         }
         #endregion
 
-        #region DeleteCardAccountDetail
-        [HttpDelete("DeleteCardAccountDetail")]
+        #region DeleteAccountDetailByAccountNumber
+        [HttpDelete("DeleteAccountDetailByAccountNumber")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteCardAccountDetail([Required][FromQuery] string cardNumber)
+        public async Task<IActionResult> DeleteAccountDetailByAccountNumber([Required][FromQuery] string AccountNumber)
         {
             try
             {
                 var currentUserEmailPhone = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
-
                 var existingUser = await _context.TUserAccesses!.FirstOrDefaultAsync(x => x.EmailPhoneNumber == currentUserEmailPhone);
+
                 if (existingUser == null)
                 {
                     return Unauthorized(new ApiResponse<string>
@@ -442,15 +464,16 @@ namespace Hubtel.Api_Integration.Controllers
                 }
 
                 var cardAccountDetail = await _context.TWalletAccountDetails!
-                    .FirstOrDefaultAsync(x => x.AccountNumber == cardNumber);
+                    .FirstOrDefaultAsync(x => x.AccountNumber == AccountNumber);
 
                 if (cardAccountDetail == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound, new ApiResponse<string>
                     {
-                        Data = "Card Account Detail does not exist",
-                        Message = "Card Account Detail does not exist",
-                        Success = false
+                        Data = "Account Number does not exist",
+                        Message = "Account Number does not exist",
+                        Success = false,
+                        StatusCode = StatusCodes.Status404NotFound
                     });
                 }
 
@@ -471,24 +494,21 @@ namespace Hubtel.Api_Integration.Controllers
                 _context.TWalletAccountDetails!.Remove(cardAccountDetail);
                 var output = await _context.SaveChangesAsync();
 
-                if (output > 0)
-                {
-                    return StatusCode(StatusCodes.Status200OK, new ApiResponse<string>
+                return output > 0
+                    ? StatusCode(StatusCodes.Status200OK, new ApiResponse<string>
                     {
-                        Data = cardNumber,
-                        Message = "Card Account Detail deleted successfully",
-                        Success = true
-                    });
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
+                        Data = AccountNumber,
+                        Message = "Account Number deleted successfully",
+                        Success = true,
+                        StatusCode = StatusCodes.Status200OK
+                    })
+                    : StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<string>
                     {
                         Data = "An error occurred while deleting Card Account Detail",
                         Message = "An error occurred while deleting Card Account Detail",
-                        Success = false
+                        Success = false,
+                        StatusCode = StatusCodes.Status500InternalServerError
                     });
-                }
             }
             catch (Exception ex)
             {
@@ -496,7 +516,8 @@ namespace Hubtel.Api_Integration.Controllers
                 {
                     Data = ex.Message,
                     Message = "An error occurred while deleting Card Account Detail",
-                    Success = false
+                    Success = false,
+                    StatusCode = StatusCodes.Status500InternalServerError
                 });
             }
         }
