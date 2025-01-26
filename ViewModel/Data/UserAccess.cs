@@ -8,7 +8,6 @@ namespace ViewModel.Data;
 public partial class UserAccess : Login, IUserAccess
 {
 
-    public string UserType { get; set; } = null!;
 }
 
 public partial class Login: ILogin

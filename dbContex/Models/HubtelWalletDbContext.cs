@@ -35,16 +35,15 @@ public partial class HubtelWalletDbContext : DbContext
         }
     }
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TCardType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__t_CardTy__3214EC27E4F03C2F");
+            entity.HasKey(e => e.Id).HasName("PK__t_CardTy__3214EC27B50F2D27");
 
             entity.ToTable("t_CardType");
 
-            entity.HasIndex(e => e.Name, "UQ__t_CardTy__737584F6CF34B6CD").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__t_CardTy__737584F6BFA9578B").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -60,11 +59,11 @@ public partial class HubtelWalletDbContext : DbContext
 
         modelBuilder.Entity<TSimcardType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__t_Simcar__3214EC2747608CA9");
+            entity.HasKey(e => e.Id).HasName("PK__t_Simcar__3214EC278CC244D1");
 
             entity.ToTable("t_SimcardType");
 
-            entity.HasIndex(e => e.Name, "UQ__t_Simcar__737584F60EF7F8E1").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__t_Simcar__737584F64EE1284E").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -80,11 +79,11 @@ public partial class HubtelWalletDbContext : DbContext
 
         modelBuilder.Entity<TType>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__t_Type__3214EC27FDDECF9E");
+            entity.HasKey(e => e.Id).HasName("PK__t_Type__3214EC27A5B38D6E");
 
             entity.ToTable("t_Type");
 
-            entity.HasIndex(e => e.Name, "UQ__t_Type__737584F692A80C83").IsUnique();
+            entity.HasIndex(e => e.Name, "UQ__t_Type__737584F6C0C25D4B").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -97,11 +96,11 @@ public partial class HubtelWalletDbContext : DbContext
 
         modelBuilder.Entity<TUserAccess>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__t_UserAc__3214EC2719987683");
+            entity.HasKey(e => e.Id).HasName("PK__t_UserAc__3214EC2719B92381");
 
             entity.ToTable("t_UserAccess");
 
-            entity.HasIndex(e => e.EmailPhoneNumber, "UQ__t_UserAc__CBD1C13540B6C006").IsUnique();
+            entity.HasIndex(e => e.EmailPhoneNumber, "UQ__t_UserAc__CBD1C1351F76A058").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -120,15 +119,15 @@ public partial class HubtelWalletDbContext : DbContext
 
         modelBuilder.Entity<TUserProfile>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__t_UserPr__3214EC27AA16BCCD");
+            entity.HasKey(e => e.Id).HasName("PK__t_UserPr__3214EC2713FAFE97");
 
             entity.ToTable("t_UserProfile");
 
-            entity.HasIndex(e => e.LegalName, "UQ__t_UserPr__07D0C9F85398A561").IsUnique();
+            entity.HasIndex(e => e.LegalName, "UQ__t_UserPr__07D0C9F8B4F0ACE3").IsUnique();
 
-            entity.HasIndex(e => e.IdentityCardNumber, "UQ__t_UserPr__59CD5121269EF293").IsUnique();
+            entity.HasIndex(e => e.IdentityCardNumber, "UQ__t_UserPr__59CD512129CEC45C").IsUnique();
 
-            entity.HasIndex(e => e.EmailPhone, "UQ__t_UserPr__7213B70D22DD3DB3").IsUnique();
+            entity.HasIndex(e => e.EmailPhone, "UQ__t_UserPr__7213B70D7056D35E").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -155,11 +154,11 @@ public partial class HubtelWalletDbContext : DbContext
 
         modelBuilder.Entity<TWalletAccountDetail>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__t_Wallet__3214EC2778EF106E");
+            entity.HasKey(e => e.Id).HasName("PK__t_Wallet__3214EC2725044853");
 
             entity.ToTable("t_WalletAccountDetails");
 
-            entity.HasIndex(e => e.AccountNumber, "UQ__t_Wallet__A4E9FFE93E5DB0CA").IsUnique();
+            entity.HasIndex(e => e.AccountNumber, "UQ__t_Wallet__BE2ACD6F74114AB8").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -182,12 +181,10 @@ public partial class HubtelWalletDbContext : DbContext
 
             entity.HasOne(d => d.CardType).WithMany(p => p.TWalletAccountDetails)
                 .HasForeignKey(d => d.CardTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_t_Card_AccountDetails_And_t_CardType");
 
             entity.HasOne(d => d.SimCardType).WithMany(p => p.TWalletAccountDetails)
                 .HasForeignKey(d => d.SimCardTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_t_Card_AccountDetails_And_t_SimcardType");
 
             entity.HasOne(d => d.UserAccess).WithMany(p => p.TWalletAccountDetails)

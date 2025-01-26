@@ -20,8 +20,6 @@ namespace ViewModel.Interfaces
         { typeof(IUserProfile), typeof(UserProfile) },
         { typeof(IWalletAccountDetail), typeof(WalletAccountDetail) },
         { typeof(IWalletAccountDetailOut), typeof(WalletAccountDetailOut) },
-        { typeof(IWalletAccountDetail), typeof(WalletAccountDetail) },
-        { typeof(IWalletAccountDetailOut), typeof(WalletAccountDetailOut) },
         { typeof(ILogin), typeof(Login) }
     };
 

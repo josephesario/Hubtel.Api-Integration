@@ -8,7 +8,7 @@ namespace ViewModel.Interfaces
 {
     public interface  ILogin
     {
-            public string EmailPhoneNumber { get; set; }
+            public string? EmailPhoneNumber { get; set; }
             public string? UserSecret { get; set; }
        
     }

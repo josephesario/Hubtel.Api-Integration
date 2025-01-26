@@ -30,12 +30,10 @@ namespace Hubtel.Api_Integration.Controllers
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateCardAccountDetail([Required][FromBody] IWalletAccountDetail model)
+        public async Task<IActionResult> CreateCardAccountDetail([Required][FromHeader] string AccountType, [Required][FromBody] IWalletAccountDetail model)
         {
             try
             {
-
-               
 
                 var legalName = await _context.TUserProfiles!.FirstOrDefaultAsync(x => x.LegalName == model.ProfileLegalName);
                 if (legalName == null)
@@ -49,7 +47,7 @@ namespace Hubtel.Api_Integration.Controllers
                 }
 
 
-                if(string.IsNullOrWhiteSpace(model.AccountNumber) || string.IsNullOrWhiteSpace(model.AccountType) || string.IsNullOrWhiteSpace(model.CardType))
+                if (string.IsNullOrWhiteSpace(model.AccountNumber) || string.IsNullOrWhiteSpace(AccountType) || string.IsNullOrWhiteSpace(model.AccountScheme))
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
                     {
@@ -59,7 +57,7 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
-                if(!Validations.IsEmailPhoneValid(model.AccountNumber))
+                if (!Validations.IsEmailPhoneValid(model.AccountNumber))
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
                     {
@@ -70,28 +68,19 @@ namespace Hubtel.Api_Integration.Controllers
 
                 }
 
-                var cardType = _context.TCardTypes!.FirstOrDefault(x => x.Name == model.CardType)?.Name;
 
-                if (cardType == null)
+
+
+
+                var simType = _context.TSimcardTypes!.FirstOrDefault(x => x.Name == model.AccountScheme)?.Name;
+                var cardType = _context.TCardTypes!.FirstOrDefault(x => x.Name == model.AccountScheme)?.Name;
+
+                if (simType == null && cardType == null)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
                     {
-                        Data = "Card Type does not exist",
-                        Message = "Card Type does not exist",
-                        Success = false
-                    });
-                }
-
-
-
-                var simType = _context.TSimcardTypes!.FirstOrDefault(x => x.Name == model.CardType)?.Name;
-
-                if (simType == null)
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
-                    {
-                        Data = "Sim Card Type does not exist",
-                        Message = "Sim Card Type does not exist",
+                        Data = "Card Type Or Provided Sim Card type does not exist",
+                        Message = "Card Type Or Provided Sim Card type does not exist",
                         Success = false
                     });
                 }
@@ -104,7 +93,7 @@ namespace Hubtel.Api_Integration.Controllers
                     return Conflict(new ApiResponse<string>
                     {
                         Success = false,
-                        Message = "Card Number Already exist",
+                        Message = "Wallet Account Already exist",
                         StatusCode = StatusCodes.Status401Unauthorized,
                         Errors = new[] { "Wallet Already exist" }
                     });
@@ -131,19 +120,21 @@ namespace Hubtel.Api_Integration.Controllers
 
                 var cardAccountCount = _context.TWalletAccountDetails!.Count(x => x.UserProfileId == legalName.Id);
 
-  
+
                 if (cardAccountCount >= 5)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
                     {
                         Data = "You have reached the maximum number of accounts",
                         Message = "You have reached the maximum number of accounts",
-                        Success = false
+                        Success = false,
+                        StatusCode = 400
+
                     });
                 }
 
 
-                var accountTypeExist = _context.TTypes!.FirstOrDefault(x => x.Name == model.AccountType);
+                var accountTypeExist = _context.TTypes!.FirstOrDefault(x => x.Name == AccountType);
                 if (accountTypeExist == null)
                 {
                     return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
@@ -154,19 +145,105 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
+                string cardNumber = string.Empty;
+                string squemaCardId = string.Empty;
+                string squemaSimId = string.Empty;
 
-                var cardNumber = model.AccountNumber!.Substring(0, 6);
+                if (accountTypeExist.Name!.ToLower().Equals("card")) {
 
-                var cardAccountDetail = new TWalletAccountDetail
+                    if (model.AccountNumber.Length == 16)
+                    {
+                        if (cardType != null) 
+                        { 
+                            cardNumber = model.AccountNumber!.Substring(0, 6);
+                            squemaCardId = _context.TCardTypes!.FirstOrDefault(x => x.Name == model.AccountScheme)!.Id.ToString();
+                        }
+                        else
+                        {
+                            return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
+                            {
+                                Data = "Make Sure The Squema You Have Selected Belongs To The Account Type!!",
+                                Message = "Make Sure The Squema You Have Selected Belongs To The Account Type!!",
+                                Success = false
+                            });
+                        }
+
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
+                        {
+                            Data = "Make Sure To Enter A valid Card Number 16 Degits for (Visa Or Master Card!)!!",
+                            Message = "Make Sure To Enter A valid Card Number 16 Degits!!",
+                            Success = false,
+                            StatusCode = 400
+                            
+                        });
+                    }
+
+                }
+                else
                 {
-                    AccountNumber = cardNumber,
-                    CardTypeId = _context.TCardTypes!.FirstOrDefault(x => x.Name == model.CardType)!.Id,
+                    var outPhoneNumber = Validations.IsPhoneNumberValid(model.AccountNumber);
+                    if (outPhoneNumber)
+                    {
+                        if (accountTypeExist.Name!.ToLower().Equals("momo"))
+                        {
+                            if (simType != null)
+                            {
+                                cardNumber = model.AccountNumber;
+                                var outputResult = _context.TSimcardTypes!.FirstOrDefault(x => x.Name == model.AccountScheme)!.Id.ToString();
+                                if (outputResult==null)
+                                {
+                                    squemaSimId = null;
+                                }
+                                else
+                                {
+                                    squemaSimId = outputResult;
+                                }
+
+                            }
+                            else
+                            {
+                                return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
+                                {
+                                    Data = "Make Sure The Squema You Have Selected Belongs To The Account Type!!",
+                                    Message = "Make Sure The Squema You Have Selected Belongs To The Account Type!!",
+                                    Success = false,
+                                    StatusCode = 400
+                                });
+                            }
+                            
+
+                        }
+                       
+                    }
+                    else
+                    {
+                        return StatusCode(StatusCodes.Status400BadRequest, new ApiResponse<string>
+                        {
+                            Data = "Invalide Phone Number Or Card Provided",
+                            Message = "Invalide Phone Number Or Card Provided",
+                            Success = false,
+                            StatusCode = 400
+                        });
+                    }
+                }
+
+
+
+
+                var cardAccountDetail = new TWalletAccountDetail()
+                {
+                    AccountNumber = model.AccountNumber,
+                    CardTypeId = !string.IsNullOrEmpty(squemaCardId) ? Guid.Parse(squemaCardId) : null,
+                    SimCardTypeId = !string.IsNullOrEmpty(squemaSimId) ? Guid.Parse(squemaSimId) : null,
                     UserProfileId = legalName.Id,
                     UserAccessId = legalName.UserAccessId,
                     CreatedAt = DateTime.Now,
-                    AccountTypeId = _context.TTypes!.FirstOrDefault(x => x.Name == model.AccountType)!.Id  
-
+                    AccountTypeId = accountTypeExist.Id
                 };
+
 
                 await _context.TWalletAccountDetails!.AddAsync(cardAccountDetail);
                 var output = await _context.SaveChangesAsync();
@@ -177,7 +254,9 @@ namespace Hubtel.Api_Integration.Controllers
                     {
                         Data = model,
                         Message = "Wallet Created successfully",
-                        Success = true
+                        Success = true,
+                        StatusCode = 200
+
                     });
                 }
                 else
@@ -186,7 +265,9 @@ namespace Hubtel.Api_Integration.Controllers
                     {
                         Data = "An error occurred while creating Your Wallet Account Detail",
                         Message = "An error occurred while creating Your Wallet Account Detail",
-                        Success = false
+                        Success = false,
+                        StatusCode = 500
+
                     });
                 }
 
@@ -227,7 +308,7 @@ namespace Hubtel.Api_Integration.Controllers
                 var cardAccountDetailResponse = new WalletAccountDetail
                 {
                     AccountNumber = cardAccountDetail.AccountNumber,
-                    CardType = cardType!.Name!,
+                    AccountScheme = cardType!.Name!,
                     ProfileLegalName = _context.TUserProfiles!.FirstOrDefault(x => x.Id == cardAccountDetail.UserProfileId)!.LegalName
                 };
 
@@ -309,7 +390,7 @@ namespace Hubtel.Api_Integration.Controllers
                     .Select(card => new WalletAccountDetail
                     {
                         AccountNumber = card.AccountNumber,
-                        CardType = _context.TCardTypes!.FirstOrDefault(t => t.Id == card.CardTypeId)!.Name!,
+                        AccountScheme = _context.TCardTypes!.FirstOrDefault(t => t.Id == card.CardTypeId)!.Name!,
                         ProfileLegalName = userProfile.LegalName
                     })
                     .ToListAsync();

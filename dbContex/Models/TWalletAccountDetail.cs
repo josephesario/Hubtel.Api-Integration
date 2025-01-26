@@ -13,9 +13,9 @@ public partial class TWalletAccountDetail
 
     public Guid UserProfileId { get; set; }
 
-    public Guid SimCardTypeId { get; set; }
+    public Guid? SimCardTypeId { get; set; }
 
-    public Guid CardTypeId { get; set; }
+    public Guid? CardTypeId { get; set; }
 
     public string AccountNumber { get; set; } = null!;
 
@@ -23,9 +23,9 @@ public partial class TWalletAccountDetail
 
     public virtual TType AccountType { get; set; } = null!;
 
-    public virtual TCardType CardType { get; set; } = null!;
+    public virtual TCardType? CardType { get; set; }
 
-    public virtual TSimcardType SimCardType { get; set; } = null!;
+    public virtual TSimcardType? SimCardType { get; set; }
 
     public virtual TUserAccess UserAccess { get; set; } = null!;
 

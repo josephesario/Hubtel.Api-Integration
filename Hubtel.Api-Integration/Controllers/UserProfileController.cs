@@ -212,7 +212,7 @@ namespace Hubtel.Api_Integration.Controllers
             try
             {
 
-                var userProfile = await _context.TUserProfiles!.FirstOrDefaultAsync(e => e.IdentityCardNumber!.ToLower() == EmailGhcPhone || e.EmailPhone!.ToLower() == EmailGhcPhone);
+                var userProfile = await _context.TUserProfiles!.FirstOrDefaultAsync(e => e.IdentityCardNumber!.ToLower() == EmailGhcPhone.ToLower() || e.EmailPhone!.ToLower() == EmailGhcPhone.ToLower());
                 var currentUserEmailPhone = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
 
                 if(currentUserEmailPhone!= EmailGhcPhone)

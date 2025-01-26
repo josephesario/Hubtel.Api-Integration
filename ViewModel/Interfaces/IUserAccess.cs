@@ -9,11 +9,10 @@ namespace ViewModel.Interfaces
     public interface  IUserAccess
     {
 
-        public string EmailPhoneNumber { get; set; } 
+        public string? EmailPhoneNumber { get; set; } 
 
         public string? UserSecret { get; set; }
 
-        public string UserType { get; set; }
 
     }
 

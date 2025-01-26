@@ -60,16 +60,7 @@ namespace Hubtel.Api_Integration.Controllers
             }
 
 
-            if (string.IsNullOrWhiteSpace(userAccess.UserType))
-            {
-                return BadRequest(new ApiResponse<string>
-                {
-                    Success = false,
-                    Message = "Invalid User Access data",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "User Type is required" }
-                });
-            }
+
 
             try
             {
@@ -78,18 +69,7 @@ namespace Hubtel.Api_Integration.Controllers
                 string? ivBytesFromJson = _configuration["EncryptionKeys:ivBytes"];
 
 
-                var userType = await _context.TTypes!.FirstOrDefaultAsync(x => x.Name == userAccess.UserType);
-
-                if (userType == null)
-                {
-                    return NotFound(new ApiResponse<string>
-                    {
-                        Success = false,
-                        Message = "User Type not found",
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Errors = new[] { "User Type not found" }
-                    });
-                }
+                
 
                 var userAccessExist = await _context.TUserAccesses?.AnyAsync(x => x.EmailPhoneNumber == userAccess.EmailPhoneNumber)!;
                 if (userAccessExist) {
@@ -124,14 +104,13 @@ namespace Hubtel.Api_Integration.Controllers
                 if (result > 0)
                 {
 
-                    IUserAccess userAcc = new UserAccess
+                    UserAccess userAcc = new UserAccess
                     {
                         EmailPhoneNumber = userAccessEntity.EmailPhoneNumber,
                         UserSecret = userAccess.UserSecret,
-                        UserType = userAccess.UserType
                     };
 
-                    return Ok(new ApiResponse<IUserAccess>
+                    return Ok(new ApiResponse<UserAccess>
                     {
                         Success = true,
                         Message = "User Access created successfully",
@@ -223,13 +202,13 @@ namespace Hubtel.Api_Integration.Controllers
                 });
             }
 
-            IUserAccess userAcc = new UserAccess
+            UserAccess userAcc = new UserAccess
             {
                 EmailPhoneNumber = userAccess.EmailPhoneNumber,
                 UserSecret = userAccess.UserSecret,
             };
 
-            return Ok(new ApiResponse<IUserAccess>
+            return Ok(new ApiResponse<UserAccess>
             {
                 Success = true,
                 Message = "User data retrieved successfully",

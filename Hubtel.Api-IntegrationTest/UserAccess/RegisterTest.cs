@@ -49,7 +49,6 @@ namespace Hubtel.Api_IntegrationTest.UserAccessControl
             var user = new Mock<IUserAccess>();
             user.SetupGet(u => u.EmailPhoneNumber).Returns(null as string);
             user.SetupGet(u => u.UserSecret).Returns("ValidPass123");
-            user.SetupGet(u => u.UserType).Returns("Admin");
 
             var result = await _controller.Register(user.Object);
 
@@ -66,7 +65,6 @@ namespace Hubtel.Api_IntegrationTest.UserAccessControl
             var user = new Mock<IUserAccess>();
             user.SetupGet(u => u.EmailPhoneNumber).Returns("user@example.com");
             user.SetupGet(u => u.UserSecret).Returns(null as string);
-            user.SetupGet(u => u.UserType).Returns("Admin");
 
             var result = await _controller.Register(user.Object);
 
@@ -83,7 +81,6 @@ namespace Hubtel.Api_IntegrationTest.UserAccessControl
             var user = new Mock<IUserAccess>();
             user.SetupGet(u => u.EmailPhoneNumber).Returns("user@example.com");
             user.SetupGet(u => u.UserSecret).Returns("ValidPass123");
-            user.SetupGet(u => u.UserType).Returns(null as string);
 
             var result = await _controller.Register(user.Object);
 
@@ -100,7 +97,6 @@ namespace Hubtel.Api_IntegrationTest.UserAccessControl
             var user = new Mock<IUserAccess>();
             user.SetupGet(u => u.EmailPhoneNumber).Returns("user@example.com");
             user.SetupGet(u => u.UserSecret).Returns("ValidPass123");
-            user.SetupGet(u => u.UserType).Returns("NonExistentType");
 
             var result = await _controller.Register(user.Object);
 
