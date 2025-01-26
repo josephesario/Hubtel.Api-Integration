@@ -2,7 +2,7 @@
 
 ## Description
 
-This project provides an API service for managing user wallets on the Simulated Hubtel Wallet Web Api. The API is built with **ASP.NET 8** and uses **SQL Server Management Studio (SSMS)** for data storage. The service includes endpoints for adding and removing wallets, with business rules in place to prevent duplicate wallets, limit the number of wallets per user, and store only the first six digits of the card number for security.
+This project provides an API service for managing user wallets Is a Simulated Hubtel Wallet Web Api. The API is built with **ASP.NET 8** and uses **SQL Server Management Studio (SSMS)** for data storage. The service includes endpoints for adding and removing wallets, with business rules in place to prevent duplicate wallets, limit the number of wallets per user, and store only the first six digits of the card number for security.
 
 The project also integrates **Token-based encryption** for secure transactions and includes **Swagger** for easy API documentation and testing.
 
