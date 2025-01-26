@@ -22,6 +22,7 @@ The project also integrates **Token-based encryption** for secure transactions a
 ## Technologies Used
 
 - **ASP.NET Core 8**
+- **XUnit For Testing**
 - **SQL Server Management Studio (SSMS)**
 - **JWT Token-based Authentication**
 - **Swagger for API Documentation**
