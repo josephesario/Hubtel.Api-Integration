@@ -48,6 +48,7 @@ namespace Hubtel.Api_Integration.Controllers
                 });
             }
 
+            // Validate Email/Phone Number
             if (string.IsNullOrWhiteSpace(userAccess.EmailPhoneNumber) || !Validations.IsEmailPhoneValid(userAccess.EmailPhoneNumber))
             {
                 return BadRequest(new ApiResponse<string>
@@ -59,20 +60,29 @@ namespace Hubtel.Api_Integration.Controllers
                 });
             }
 
+            // Validate UserSecret (Password)
+            if (string.IsNullOrWhiteSpace(userAccess.UserSecret))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Invalid User Access data",
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Errors = new[] { "Password is required" }
+                });
+            }
 
 
 
             try
             {
-
+                // Rest of the existing implementation remains the same
                 string? keyBytesFromJson = _configuration["EncryptionKeys:keyBytes"];
                 string? ivBytesFromJson = _configuration["EncryptionKeys:ivBytes"];
 
-
-                
-
                 var userAccessExist = await _context.TUserAccesses?.AnyAsync(x => x.EmailPhoneNumber == userAccess.EmailPhoneNumber)!;
-                if (userAccessExist) {
+                if (userAccessExist)
+                {
                     return Conflict(new ApiResponse<string>
                     {
                         Success = false,
@@ -82,28 +92,23 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
-
                 byte[] keyBytes = Convert.FromBase64String(keyBytesFromJson!);
                 byte[] ivBytes = Convert.FromBase64String(ivBytesFromJson!);
-
 
                 EncryptionService encryptionService = new(keyBytes, ivBytes);
                 string secretEncrypt = encryptionService.Encrypt(userAccess.UserSecret!);
 
-
                 var userAccessEntity = new TUserAccess
                 {
                     EmailPhoneNumber = userAccess.EmailPhoneNumber,
-                    UserSecret = secretEncrypt
+                    UserSecret = secretEncrypt,
                 };
-
 
                 await _context.TUserAccesses!.AddAsync(userAccessEntity);
                 var result = await _context.SaveChangesAsync();
 
                 if (result > 0)
                 {
-
                     UserAccess userAcc = new UserAccess
                     {
                         EmailPhoneNumber = userAccessEntity.EmailPhoneNumber,
@@ -151,7 +156,6 @@ namespace Hubtel.Api_Integration.Controllers
                     Errors = new[] { ex.Message }
                 });
             }
-
         }
         #endregion
 

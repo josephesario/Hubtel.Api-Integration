@@ -24,13 +24,13 @@ namespace Hubtel.Api_Integration.Controllers
             _configuration = configuration;
         }
 
-        #region CreateCardAccountDetail
+        #region CreateAccountDetail
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<IWalletAccountDetail>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateCardAccountDetail([Required][FromHeader] string AccountType, [Required][FromBody] IWalletAccountDetail model)
+        public async Task<IActionResult> CreateAccountDetail([Required][FromHeader] string AccountType, [Required][FromBody] IWalletAccountDetail model)
         {
             try
             {
@@ -374,10 +374,9 @@ namespace Hubtel.Api_Integration.Controllers
         {
             try
             {
-                var currentUserEmailPhone = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
+                var currentUserEmailPhone = User.FindFirst(ClaimTypes.Name)?.Value;
 
-                var existingUser = await _context.TUserAccesses!.FirstOrDefaultAsync(x => x.EmailPhoneNumber == currentUserEmailPhone);
-                if (existingUser == null)
+                if (string.IsNullOrWhiteSpace(currentUserEmailPhone))
                 {
                     return Unauthorized(new ApiResponse<string>
                     {
@@ -388,6 +387,20 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
+                var existingUser = await _context.TUserAccesses
+                    ?.Where(x => x.EmailPhoneNumber == currentUserEmailPhone)
+                    .FirstOrDefaultAsync()!;
+
+                if (existingUser == null)
+                {
+                    return Unauthorized(new ApiResponse<string>
+                    {
+                        Success = false,
+                        Message = "User not authenticated",
+                        StatusCode = StatusCodes.Status401Unauthorized,
+                        Errors = new[] { "You are not authorized to perform this operation" }
+                    });
+                }
 
                 var userProfile = await _context.TUserProfiles!.FirstOrDefaultAsync(x => x.UserAccessId == existingUser.Id);
                 if (userProfile == null)

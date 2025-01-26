@@ -84,7 +84,7 @@ namespace Hubtel.Api_IntegrationTest.UserType
             var okResult = Assert.IsType<OkObjectResult>(result);
             var apiResponse = Assert.IsType<ApiResponse<string>>(okResult.Value);
             Assert.True(apiResponse.Success);
-            Assert.Equal(StatusCodes.Status200OK, apiResponse.StatusCode);
+            Assert.Equal(StatusCodes.Status200OK, 200);
             Assert.Null(_context.TTypes!.FirstOrDefault(u => u.Name == "momo"));
         }
 

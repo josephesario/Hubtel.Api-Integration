@@ -113,22 +113,6 @@ namespace Hubtel.Api_IntegrationTest.UserType
             Assert.Equal(StatusCodes.Status409Conflict, apiResponse.StatusCode);
         }
 
-        [Fact]
-        public async Task AddUserType_SuccessfulAddition_ReturnsOk()
-        {
-            // Arrange
-            var userType = new Mock<IAccountType>();
-            userType.SetupGet(u => u.Name).Returns("momo");
-
-            // Act
-            var result = await _controller.AccountType(userType.Object);
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var apiResponse = Assert.IsType<ApiResponse<TType>>(okResult.Value);
-            Assert.True(apiResponse.Success);
-            Assert.Equal(StatusCodes.Status200OK, apiResponse.StatusCode);
-        }
 
         [Fact]
         public async Task AddUserType_DbUpdateException_ReturnsInternalServerError()

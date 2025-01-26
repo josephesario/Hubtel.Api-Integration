@@ -59,6 +59,35 @@ namespace Hubtel.Api_IntegrationTest.UserAccessControl
             Assert.Contains("Email Or Phone Number is required", apiResponse.Errors);
         }
 
+
+        [Fact]
+        public async Task Register_NullUserAccess_ReturnsBadRequest()
+        {
+            var result = await _controller.Register(null);
+
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var apiResponse = Assert.IsType<ApiResponse<string>>(badRequestResult.Value);
+            Assert.False(apiResponse.Success);
+            Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
+            Assert.Contains("User Access Data is required", apiResponse.Errors);
+        }
+
+        [Fact]
+        public async Task Register_InvalidEmailPhoneNumber_ReturnsBadRequest()
+        {
+            var user = new Mock<IUserAccess>();
+            user.SetupGet(u => u.EmailPhoneNumber).Returns("");
+            user.SetupGet(u => u.UserSecret).Returns("ValidPass123");
+
+            var result = await _controller.Register(user.Object);
+
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var apiResponse = Assert.IsType<ApiResponse<string>>(badRequestResult.Value);
+            Assert.False(apiResponse.Success);
+            Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
+            Assert.Contains("Email Or Phone Number is required", apiResponse.Errors);
+        }
+
         [Fact]
         public async Task Register_MissingPassword_ReturnsBadRequest()
         {
@@ -71,41 +100,10 @@ namespace Hubtel.Api_IntegrationTest.UserAccessControl
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
             var apiResponse = Assert.IsType<ApiResponse<string>>(badRequestResult.Value);
             Assert.False(apiResponse.Success);
-            Assert.Equal(StatusCodes.Status400BadRequest, apiResponse.StatusCode);
+            Assert.Equal(StatusCodes.Status400BadRequest, badRequestResult.StatusCode);
             Assert.Contains("Password is required", apiResponse.Errors);
         }
 
-        [Fact]
-        public async Task Register_MissingUserType_ReturnsBadRequest()
-        {
-            var user = new Mock<IUserAccess>();
-            user.SetupGet(u => u.EmailPhoneNumber).Returns("user@example.com");
-            user.SetupGet(u => u.UserSecret).Returns("ValidPass123");
-
-            var result = await _controller.Register(user.Object);
-
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var apiResponse = Assert.IsType<ApiResponse<string>>(badRequestResult.Value);
-            Assert.False(apiResponse.Success);
-            Assert.Equal(StatusCodes.Status400BadRequest, apiResponse.StatusCode);
-            Assert.Contains("User Type is required", apiResponse.Errors);
-        }
-
-        [Fact]
-        public async Task Register_UserTypeNotFound_ReturnsNotFound()
-        {
-            var user = new Mock<IUserAccess>();
-            user.SetupGet(u => u.EmailPhoneNumber).Returns("user@example.com");
-            user.SetupGet(u => u.UserSecret).Returns("ValidPass123");
-
-            var result = await _controller.Register(user.Object);
-
-            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-            var apiResponse = Assert.IsType<ApiResponse<string>>(notFoundResult.Value);
-            Assert.False(apiResponse.Success);
-            Assert.Equal(StatusCodes.Status404NotFound, apiResponse.StatusCode);
-            Assert.Contains("User Type not found", apiResponse.Errors);
-        }
-
+       
     }
 }
