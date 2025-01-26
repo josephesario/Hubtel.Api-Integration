@@ -20,6 +20,16 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Enable XML comments to be included in the Swagger documentation
+    var xmlFile = $"{AppDomain.CurrentDomain.FriendlyName}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+});
+
+
 
 builder.Services.AddSwaggerGen(options =>
 {

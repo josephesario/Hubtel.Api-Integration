@@ -25,6 +25,23 @@ namespace Hubtel.Api_Integration.Controllers
         }
 
         #region CreateAccountDetail
+        /// <summary>
+        /// Creates a new wallet account detail for a user. The account can be linked to either a card (Visa/MasterCard) or a mobile money (MOMO) account (MTN, Vodafone, AirtelTigo).
+        /// </summary>
+        /// <param name="AccountType">The type of account being created. Can be "card" for card-based accounts or "momo" for mobile money accounts.</param>
+        /// <param name="model">The wallet account detail to be created, containing the user's profile legal name, account number, and account scheme (e.g., card or momo).</param>
+        /// <returns>
+        /// Returns a response containing the status of the account creation:
+        /// - HTTP 200 (OK) if the account is created successfully.
+        /// - HTTP 400 (Bad Request) if the provided data is invalid or missing required fields.
+        /// - HTTP 409 (Conflict) if the account already exists.
+        /// - HTTP 500 (Internal Server Error) if an error occurs during processing.
+        /// </returns>
+        /// <response code="200">Account created successfully.</response>
+        /// <response code="400">Invalid request or missing required data (e.g., account number, account scheme).</response>
+        /// <response code="409">Account already exists.</response>
+        /// <response code="500">Internal server error during account creation process.</response>
+
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<IWalletAccountDetail>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -286,6 +303,24 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region AccountDetailByAccountNumber
+        /// <summary>
+        /// Retrieves account details for a given account number. The account details include the account scheme and the user's legal name.
+        /// </summary>
+        /// <param name="AccountNumber">The account number for which the details are being retrieved. This parameter is required and passed via the query string.</param>
+        /// <returns>
+        /// Returns a response containing the account details:
+        /// - HTTP 200 (OK) if the account details are retrieved successfully.
+        /// - HTTP 400 (Bad Request) if the account is found but the account scheme cannot be determined.
+        /// - HTTP 401 (Unauthorized) if the user is not authorized to access the account details.
+        /// - HTTP 404 (Not Found) if the account number does not exist.
+        /// - HTTP 500 (Internal Server Error) if an error occurs during the process.
+        /// </returns>
+        /// <response code="200">Account details retrieved successfully.</response>
+        /// <response code="400">Account found, but no matching account scheme was found.</response>
+        /// <response code="401">Unauthorized access to the account. The user is not authorized to perform this operation.</response>
+        /// <response code="404">Account number not found.</response>
+        /// <response code="500">Internal server error while processing the request.</response>
+
         [HttpGet("AccountDetailByAccountNumber")]
         [ProducesResponseType(typeof(ApiResponse<IWalletAccountDetail>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -365,6 +400,21 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region GetAllCardAccountDetails
+        /// <summary>
+        /// Retrieves all card account details associated with the current authenticated user. The details include account number, account scheme, legal name, account type, and creation date.
+        /// </summary>
+        /// <returns>
+        /// Returns a list of card account details for the authenticated user:
+        /// - HTTP 200 (OK) if the card account details are retrieved successfully.
+        /// - HTTP 400 (Bad Request) if the user's profile is not found.
+        /// - HTTP 401 (Unauthorized) if the user is not authenticated or authorized to perform this operation.
+        /// - HTTP 500 (Internal Server Error) if an error occurs during the process.
+        /// </returns>
+        /// <response code="200">Card account details retrieved successfully.</response>
+        /// <response code="400">User profile not found.</response>
+        /// <response code="401">User is not authenticated or authorized to access the account details.</response>
+        /// <response code="500">Internal server error while processing the request.</response>
+
         [HttpGet("GetAllCardAccountDetails")]
         [ProducesResponseType(typeof(ApiResponse<List<IWalletAccountDetail>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -452,6 +502,24 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region DeleteAccountDetailByAccountNumber
+        /// <summary>
+        /// Deletes the card account details associated with the provided account number, ensuring the user is authenticated and authorized to perform the deletion.
+        /// </summary>
+        /// <param name="AccountNumber">The account number of the card account detail to be deleted.</param>
+        /// <returns>
+        /// Returns the status of the delete operation:
+        /// - HTTP 200 (OK) if the account detail is successfully deleted.
+        /// - HTTP 400 (Bad Request) if the request is malformed or invalid.
+        /// - HTTP 401 (Unauthorized) if the user is not authenticated or authorized to delete the account details.
+        /// - HTTP 404 (Not Found) if the account number does not exist.
+        /// - HTTP 500 (Internal Server Error) if an error occurs during the deletion process.
+        /// </returns>
+        /// <response code="200">Account number deleted successfully.</response>
+        /// <response code="400">Invalid request or malformed input.</response>
+        /// <response code="401">User is not authenticated or authorized to delete this account.</response>
+        /// <response code="404">Account number not found.</response>
+        /// <response code="500">Internal server error while processing the deletion request.</response>
+
         [HttpDelete("DeleteAccountDetailByAccountNumber")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]

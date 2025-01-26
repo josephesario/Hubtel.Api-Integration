@@ -9,12 +9,22 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Hubtel.Api_Integration.Controllers
 {
+    /// <summary>
+    /// Handles API requests related to card types such as adding, retrieving, updating, and deleting card types (Visa and MasterCard).
+    /// </summary>
+    /// <remarks>
+    /// This controller supports the management of card types, with only "Visa" and "Master Card" as valid options. It allows administrators to add, retrieve, list, and delete card types in the system.
+    /// </remarks>
     [ApiController]
     [Route("api/[controller]")]
     public class CardTypeController : ControllerBase
     {
         private readonly HubtelWalletDbContext _context;
 
+        /// <summary>
+        ///  CardTypeController
+        /// </summary>
+        /// <param name="context"></param>
         public CardTypeController(HubtelWalletDbContext context)
         {
             _context = context;
@@ -22,6 +32,19 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region AddCardType
+        /// <summary>
+        /// Adds a new card type (Visa or Master Card).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint adds a new card type to the system. Only "Visa" and "Master Card" are allowed as valid card types. 
+        /// If a card type already exists, a conflict response is returned. If the data is invalid, a bad request response is returned.
+        /// </remarks>
+        /// <param name="cardType">The card type to add, including its name.</param>
+        /// <returns>An API response indicating the success or failure of the operation.</returns>
+        /// <response code="200">Card type successfully added.</response>
+        /// <response code="400">Invalid card type data provided.</response>
+        /// <response code="409">A card type with the same name already exists.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpPost("AddCardType")]
         [ProducesResponseType(typeof(ApiResponse<ICardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -100,6 +123,19 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region GetCardType
+        /// <summary>
+        /// Retrieves a specific card type by its name (Visa or Master Card).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint retrieves a card type based on its name. Only "Visa" and "Master Card" are valid card types. 
+        /// If the card type does not exist, a 404 response is returned.
+        /// </remarks>
+        /// <param name="Name">The name of the card type to retrieve (e.g., "Visa" or "Master Card").</param>
+        /// <returns>The details of the requested card type.</returns>
+        /// <response code="200">The requested card type was found.</response>
+        /// <response code="400">Invalid card type name provided.</response>
+        /// <response code="404">The requested card type was not found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpGet("GetCardTypeByName")]
         [ProducesResponseType(typeof(ApiResponse<CardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -168,6 +204,16 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region GetAllCardTypes
+        /// <summary>
+        /// Retrieves all available card types (Visa and Master Card).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint returns a list of all available card types. If no card types are available, a 404 response is returned.
+        /// </remarks>
+        /// <returns>A list of all card types.</returns>
+        /// <response code="200">All card types were found.</response>
+        /// <response code="404">No card types found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpGet("GetAllCardTypes")]
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<ICardType>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
@@ -209,6 +255,19 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region DeleteCardType
+        /// <summary>
+        /// Deletes an existing card type by its name (Visa or Master Card).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint deletes a card type from the system. The card type must be either "Visa" or "Master Card". 
+        /// If the card type is not found, a 404 response is returned. If the card type has dependent data, a 400 response is returned.
+        /// </remarks>
+        /// <param name="Name">The name of the card type to delete (e.g., "Visa" or "MasterCard").</param>
+        /// <returns>An API response indicating the success or failure of the operation.</returns>
+        /// <response code="200">Card type successfully deleted.</response>
+        /// <response code="400">Invalid card type name or card type has dependent data.</response>
+        /// <response code="404">The specified card type was not found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpDelete("DeleteCardType")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]

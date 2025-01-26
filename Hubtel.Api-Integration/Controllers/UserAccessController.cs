@@ -13,6 +13,9 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
+    /// <summary>
+    /// Controller for managing user access operations such as registration and retrieval by email or phone.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UserAccessController : Controller
@@ -20,6 +23,12 @@ namespace Hubtel.Api_Integration.Controllers
 
         private readonly HubtelWalletDbContext _context;
         private readonly IConfiguration _configuration;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserAccessController"/> class.
+        /// </summary>
+        /// <param name="context">Database context for accessing user data.</param>
+        /// <param name="configuration">Configuration for retrieving encryption keys.</param>
 
         public UserAccessController(HubtelWalletDbContext context, IConfiguration configuration)
         {
@@ -29,6 +38,17 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region Register
+        /// <summary>
+        /// Registers a new user with the provided user access data.
+        /// </summary>
+        /// <param name="userAccess">The user access data containing email/phone number and password.</param>
+        /// <returns>
+        /// A status code and message indicating the outcome of the registration.
+        /// </returns>
+        /// <response code="200">User access successfully created.</response>
+        /// <response code="400">Invalid input data provided.</response>
+        /// <response code="404">Resource not found.</response>
+        /// <response code="409">User access already exists.</response>
         [HttpPost("Register")]
         [ProducesResponseType(typeof(ApiResponse<IUserAccess>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -161,6 +181,16 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region GetUserByEmailPhone
+        /// <summary>
+        /// Retrieves a user's details by their email or phone number.
+        /// </summary>
+        /// <param name="emailPhone">The email or phone number of the user.</param>
+        /// <returns>
+        /// A status code and the user's access details if found.
+        /// </returns>
+        /// <response code="200">User access successfully retrieved.</response>
+        /// <response code="404">User access not found.</response>
+        /// <response code="401">Unauthorized access to the requested data.</response>
         [Authorize]
         [HttpGet("GetUserByEmailPhone")]
         [ProducesResponseType(typeof(ApiResponse<IUserAccess>), StatusCodes.Status200OK)]
@@ -222,9 +252,22 @@ namespace Hubtel.Api_Integration.Controllers
         }
         #endregion
 
-       
+
 
         #region Delete
+        /// <summary>
+        /// Deletes a user access based on the provided email or phone number.
+        /// This operation removes the user's access from the system if no dependent data exists.
+        /// </summary>
+        /// <param name="emailPhoneNumber">The email or phone number of the user whose access is to be deleted. This parameter is required and must be valid.</param>
+        /// <returns>A response indicating the success or failure of the operation.</returns>
+        /// <response code="200">The user access was successfully deleted.</response>
+        /// <response code="400">The provided email or phone number is invalid or missing.</response>
+        /// <response code="404">No user access was found with the provided email or phone number.</response>
+        /// <response code="409">The user access cannot be deleted because there are dependent data (e.g., associated wallet account).</response>
+        /// <response code="500">An unexpected error occurred while processing the request.</response>
+        /// <response code="503">The service is unavailable due to a temporary issue (e.g., database unavailability).</response>
+
         [HttpDelete("Delete")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]

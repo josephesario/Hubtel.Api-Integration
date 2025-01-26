@@ -7,18 +7,43 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
+
+    /// <summary>
+    /// Handles API requests related to SIM card types such as adding, retrieving, updating, and deleting SIM card types (MTN, Vodafone, and Airteltigo).
+    /// </summary>
+    /// <remarks>
+    /// This controller manages SIM card types in the system, restricting the types to "MTN", "Vodafone", and "Airteltigo". 
+    /// It allows administrators to add, retrieve, list, and delete SIM card types.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     public class SimcardTypeController : Controller
     {
         private readonly HubtelWalletDbContext _context;
 
+        /// <summary>
+        ///  SimcardTypeController 
+        /// </summary>
+        /// <param name="context"></param>
         public SimcardTypeController(HubtelWalletDbContext context)
         {
             _context = context;
         }
 
         #region AddSimType
+        /// <summary>
+        /// Adds a new SIM card type (MTN, Vodafone, or Airteltigo).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint adds a new SIM card type to the system. Only "MTN", "Vodafone", and "Airteltigo" are allowed as valid SIM card types. 
+        /// If a SIM card type already exists, a conflict response is returned. If the data is invalid, a bad request response is returned.
+        /// </remarks>
+        /// <param name="simType">The SIM card type to add, including its name.</param>
+        /// <returns>An API response indicating the success or failure of the operation.</returns>
+        /// <response code="200">SIM type successfully added.</response>
+        /// <response code="400">Invalid SIM type data provided.</response>
+        /// <response code="409">A SIM type with the same name already exists.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpPost("AddSimType")]
         [ProducesResponseType(typeof(ApiResponse<ISimcardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -96,6 +121,19 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region GetSimTypeByName
+        /// <summary>
+        /// Retrieves a specific SIM card type by its name (MTN, Vodafone, or Airteltigo).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint retrieves a SIM card type based on its name. Only "MTN", "Vodafone", and "Airteltigo" are valid SIM card types. 
+        /// If the SIM card type does not exist, a 404 response is returned.
+        /// </remarks>
+        /// <param name="name">The name of the SIM card type to retrieve (e.g., "MTN", "Vodafone", or "Airteltigo").</param>
+        /// <returns>The details of the requested SIM card type.</returns>
+        /// <response code="200">The requested SIM card type was found.</response>
+        /// <response code="400">Invalid SIM type name provided.</response>
+        /// <response code="404">The requested SIM type was not found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpGet("GetSimTypeByName")]
         [ProducesResponseType(typeof(ApiResponse<SimcardType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -162,6 +200,16 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region GetAllSimTypes
+        /// <summary>
+        /// Retrieves all available SIM card types (MTN, Vodafone, Airteltigo).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint returns a list of all available SIM card types. If no SIM types are available, a 404 response is returned.
+        /// </remarks>
+        /// <returns>A list of all SIM card types.</returns>
+        /// <response code="200">All SIM card types were found.</response>
+        /// <response code="404">No SIM card types found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpGet("GetAllSimTypes")]
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<ISimcardType>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
@@ -202,6 +250,19 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region DeleteSimType
+        /// <summary>
+        /// Deletes an existing SIM card type by its name (MTN, Vodafone, or Airteltigo).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint deletes a SIM card type from the system. The SIM card type must be either "MTN", "Vodafone", or "Airteltigo". 
+        /// If the SIM card type is not found, a 404 response is returned. If the SIM card type has dependent data, a 400 response is returned.
+        /// </remarks>
+        /// <param name="name">The name of the SIM card type to delete (e.g., "MTN", "Vodafone", or "Airteltigo").</param>
+        /// <returns>An API response indicating the success or failure of the operation.</returns>
+        /// <response code="200">SIM type successfully deleted.</response>
+        /// <response code="400">Invalid SIM type name or SIM type has dependent data.</response>
+        /// <response code="404">The specified SIM type was not found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpDelete("DeleteSimType")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]

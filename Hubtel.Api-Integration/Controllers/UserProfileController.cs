@@ -25,6 +25,18 @@ namespace Hubtel.Api_Integration.Controllers
         }
 
         #region AddProfile
+        /// <summary>
+        /// Adds a new user profile to the system.
+        /// This operation creates a new user profile, provided the required details (name, identity card number, and contact information) are valid.
+        /// </summary>
+        /// <param name="userProfile">The user profile to be added. It must include a legal name, identity card number, and either an email or phone number.</param>
+        /// <returns>A response indicating the success or failure of the operation.</returns>
+        /// <response code="200">The profile was successfully added.</response>
+        /// <response code="400">The provided data is invalid or required fields are missing.</response>
+        /// <response code="409">A profile with the provided identity card number already exists.</response>
+        /// <response code="500">An unexpected error occurred while processing the request.</response>
+        /// <response code="503">The service is unavailable due to a temporary issue (e.g., database unavailability).</response>
+
         [Authorize]
         [HttpPost("AddProfile")]
         [ProducesResponseType(typeof(ApiResponse<IUserProfile>), StatusCodes.Status200OK)]
@@ -159,6 +171,19 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region GetProfileByEmailGhcPhone
+        /// <summary>
+        /// Retrieves the user profile by email, phone number, or Ghana ID.
+        /// This operation fetches the profile associated with the provided email, phone number, or Ghana ID.
+        /// </summary>
+        /// <param name="EmailGhcPhone">The email or phone number (or Ghana ID) of the user whose profile is being requested.</param>
+        /// <returns>A response indicating the success or failure of the operation.</returns>
+        /// <response code="200">The user profile was successfully retrieved.</response>
+        /// <response code="400">The provided email, phone number, or Ghana ID is invalid or missing.</response>
+        /// <response code="401">The requesting user is not authorized to access the profile.</response>
+        /// <response code="404">No user profile was found with the provided identifier.</response>
+        /// <response code="500">An unexpected error occurred while processing the request.</response>
+        /// <response code="503">The service is unavailable due to a temporary issue (e.g., database unavailability).</response>
+
         [Authorize]
         [HttpGet("GetProfileByEmailGhcPhone")]
         [ProducesResponseType(typeof(ApiResponse<IUserProfile>), StatusCodes.Status200OK)]
@@ -298,6 +323,20 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region UpdateProfileByEmailGhcPhone
+        /// <summary>
+        /// Updates the user's profile using the provided email, Ghana ID, or phone number.
+        /// This operation updates the user's profile if the provided information is valid and authorized.
+        /// </summary>
+        /// <param name="userProfile">The user profile data to be updated. It must include the new IdentityCardNumber, EmailPhone, and LegalName.</param>
+        /// <param name="EmailGhcPhone">The email, Ghana ID, or phone number associated with the user whose profile is to be updated. This value is required in the request header.</param>
+        /// <returns>A response indicating the success or failure of the update operation.</returns>
+        /// <response code="200">The user profile was successfully updated.</response>
+        /// <response code="400">The provided information is invalid or incomplete (e.g., missing or incorrect email/phone/Ghana ID).</response>
+        /// <response code="401">The user is not authorized to update the profile due to mismatch with their authenticated credentials.</response>
+        /// <response code="404">The user profile was not found for the given email, Ghana ID, or phone number.</response>
+        /// <response code="500">An unexpected error occurred while updating the user profile.</response>
+        /// <response code="503">The service is temporarily unavailable due to an issue (e.g., database unavailability).</response>
+
         [Authorize]
         [HttpPut("UpdateProfileByEmailGhcPhone")]
         [ProducesResponseType(typeof(ApiResponse<IUserProfile>), StatusCodes.Status200OK)]
@@ -434,6 +473,19 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region DeleteProfile
+        /// <summary>
+        /// Deletes the user's profile based on the provided identity card number.
+        /// The deletion is only allowed if there are no associated accounts linked to the profile.
+        /// </summary>
+        /// <param name="identityCardNumber">The identity card number of the user whose profile is to be deleted. This parameter is required in the query string.</param>
+        /// <returns>A response indicating the success or failure of the profile deletion operation.</returns>
+        /// <response code="200">The profile was successfully deleted.</response>
+        /// <response code="400">The provided identity card number is invalid or missing.</response>
+        /// <response code="404">No profile was found for the given identity card number.</response>
+        /// <response code="409">The profile cannot be deleted because it has associated accounts or data.</response>
+        /// <response code="500">An unexpected error occurred while processing the profile deletion request.</response>
+        /// <response code="503">The service is temporarily unavailable due to an issue (e.g., database unavailability).</response>
+
         [Authorize]
         [HttpDelete("DeleteProfile")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]

@@ -8,6 +8,13 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
+
+    /// <summary>
+    /// Handles API requests related to account types (user types) such as creating, retrieving, updating, and deleting account types.
+    /// </summary>
+    /// <remarks>
+    /// This controller allows administrators to manage account types such as "momo" and "card". It supports CRUD operations for account types.
+    /// </remarks>
     #region AccountTypeController
     [ApiController]
     [Route("api/[controller]")]
@@ -16,23 +23,40 @@ namespace Hubtel.Api_Integration.Controllers
 
         private readonly HubtelWalletDbContext _context;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
         public AccountTypeController(HubtelWalletDbContext context)
         {
             _context = context;
         }
 
         #region AddUserType
+        /// <summary>
+        /// Adds a new account type (momo or card).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint adds a new user type to the system. The user type name must be either "momo" or "card". 
+        /// If the user type already exists, a conflict is returned. Otherwise, the new user type is added to the system.
+        /// </remarks>
+        /// <param name="accountType">The account type (user type) to add, by default (momo and card).</param>
+        /// <returns>An API response indicating the success or failure of the operation.</returns>
+        /// <response code="200">User type successfully added.</response>
+        /// <response code="400">Invalid user type data provided.</response>
+        /// <response code="409">A user type with the same name already exists.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpPost("AddAccountType")]
         [ProducesResponseType(typeof(ApiResponse<IAccountType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AccountType([Required][FromBody] IAccountType userType)
+        public async Task<IActionResult> AccountType([Required][FromBody] IAccountType accountType)
         {
             try
             {
-                if (userType == null || string.IsNullOrWhiteSpace(userType.Name))
+                if (accountType == null || string.IsNullOrWhiteSpace(accountType.Name))
                 {
                     return BadRequest(new ApiResponse<string>
                     {
@@ -45,7 +69,7 @@ namespace Hubtel.Api_Integration.Controllers
 
                 // Validate that the user type is either "momo" or "card"
                 var allowedUserTypes = new[] { "momo", "card" };
-                if (!allowedUserTypes.Contains(userType.Name.ToLower()))
+                if (!allowedUserTypes.Contains(accountType.Name.ToLower()))
                 {
                     return BadRequest(new ApiResponse<string>
                     {
@@ -57,7 +81,7 @@ namespace Hubtel.Api_Integration.Controllers
                 }
 
                 var userTypeExists = await _context.TTypes!
-                    .AnyAsync(e => e.Name!.ToLower() == userType.Name!.ToLower(), default);
+                    .AnyAsync(e => e.Name!.ToLower() == accountType.Name!.ToLower(), default);
 
                 if (userTypeExists)
                 {
@@ -66,13 +90,13 @@ namespace Hubtel.Api_Integration.Controllers
                         Success = false,
                         Message = "User type already exists",
                         StatusCode = StatusCodes.Status409Conflict,
-                        Errors = new[] { $"A user type with name '{userType.Name}' already exists" }
+                        Errors = new[] { $"A user type with name '{accountType.Name}' already exists" }
                     });
                 }
 
                 var userTypeEntity = new TType
                 {
-                    Name = userType.Name,
+                    Name = accountType.Name,
                     CreatedAt = DateTime.UtcNow,
                 };
 
@@ -113,6 +137,18 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region GetUserType
+        /// <summary>
+        /// Retrieves a specific account type by its name.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint retrieves an account type based on its name (either "momo" or "card"). If the account type does not exist, a 404 response is returned.
+        /// </remarks>
+        /// <param name="Name">The name of the account type to retrieve.</param>
+        /// <returns>The details of the requested account type.</returns>
+        /// <response code="200">The requested account type was found.</response>
+        /// <response code="400">Invalid user type name provided.</response>
+        /// <response code="404">The requested account type was not found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpGet("GetAccountTypeByName")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
@@ -178,6 +214,16 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region GetAllUserTypes
+        /// <summary>
+        /// Retrieves all account types.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint returns a list of all available account types. If no account types exist, a 404 response is returned.
+        /// </remarks>
+        /// <returns>A list of all account types.</returns>
+        /// <response code="200">All account types were found.</response>
+        /// <response code="404">No account types were found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpGet("GetAllAccountType")]
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<TType>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
@@ -218,6 +264,19 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region DeleteUserType
+        /// <summary>
+        /// Deletes an existing account type by its name.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint deletes an account type by its name. The name must be either "momo" or "card". 
+        /// If the account type does not exist, a 404 response is returned. If an error occurs, a 500 response is returned.
+        /// </remarks>
+        /// <param name="Name">The name of the account type to delete.</param>
+        /// <returns>An API response indicating the success or failure of the operation.</returns>
+        /// <response code="200">User type successfully deleted.</response>
+        /// <response code="400">Invalid user type name provided.</response>
+        /// <response code="404">The specified account type was not found.</response>
+        /// <response code="500">An error occurred while processing the request.</response>
         [HttpDelete("DeleteAccountType")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
