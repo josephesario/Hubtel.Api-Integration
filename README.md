@@ -55,7 +55,9 @@ Before setting up this project, ensure you have the following installed:
 ### SQL SERVER DB IMAGE
 ![image](https://github.com/user-attachments/assets/40d72b6a-fbce-4873-8b00-1fa8d8c939d6)
 
-- db link [https://github.com/josephesario/Hubtel.Api-Integration/blob/master/Hubtel.Api-Integration/Hubtel_WalletDb.sql]
+# SSQML  [Hubtel.com]([DATABASE](https://github.com/josephesario/Hubtel.Api-Integration/blob/master/Hubtel.Api-Integration/Hubtel_WalletDb.sql
+
+-
 
 ### XUNIT TEST
 ![Screenshot 2025-01-26 130209](https://github.com/user-attachments/assets/378d16d3-a4ca-49fe-8ccf-a7c6cff912bb)
