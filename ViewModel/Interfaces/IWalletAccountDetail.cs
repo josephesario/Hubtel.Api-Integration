@@ -7,17 +7,18 @@ using System.Threading.Tasks;
 namespace ViewModel.Interfaces
 {
 
-    public interface ICardAccountDetailOut : ICardAccountDetail
+    public interface IWalletAccountDetailOut : IWalletAccountDetail
     {
         public DateTime? CreatedAt { get; set; }
     }
 
-    public interface ICardAccountDetail
+    public interface IWalletAccountDetail
     {
 
         public string ProfileLegalName { get; set; }
         public string CardType { get; set; }
-        public string CardNumber { get; set; }
+        public string? AccountNumber { get; set; }
+        public string? AccountType { get; set; }
 
     }
 

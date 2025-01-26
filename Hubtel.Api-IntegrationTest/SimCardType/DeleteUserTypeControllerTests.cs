@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Hubtel.Api_IntegrationTest.SimCardType
 {
-    internal class DeleteUserTypeControllerTests
+    internal class DeleteAccountTypeControllerTests
     {
     }
 }

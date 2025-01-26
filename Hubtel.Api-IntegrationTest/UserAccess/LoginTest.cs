@@ -19,22 +19,22 @@ namespace Hubtel.Api_IntegrationTest
 
     public class LoginTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
-        private readonly UserAccessController _controller;
+        private readonly HubtelWalletDbContext _context;
+        private readonly AccessController _controller;
         private readonly Mock<IConfiguration> _mockConfiguration;
         private readonly Mock<DbSet<TUserAccess>> _mockUserAccessDbSet;
 
         public LoginTests()
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "UserAccessTestDb")
                 .Options;
 
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            _controller = new UserAccessController(_context, configuration);
+            _controller = new AccessController(_context, configuration);
 
             _mockConfiguration = new Mock<IConfiguration>();
             _mockUserAccessDbSet = new Mock<DbSet<TUserAccess>>();
@@ -44,10 +44,10 @@ namespace Hubtel.Api_IntegrationTest
         public async Task Login_ReturnsBadRequest_WhenLoginAccessIsNull()
         {
             // Arrange
-            ILogin loginAccess = null;
+            ILogin loginAccess = null!;
 
             // Act
-            var result = await _controller.Login(loginAccess);
+            var result = await _controller.Login(loginAccess!);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);

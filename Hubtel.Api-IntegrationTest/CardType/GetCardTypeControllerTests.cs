@@ -8,22 +8,24 @@ using Xunit;
 using Hubtel.Api_Integration.Controllers;
 using ViewModel.Data;
 using dbContex.Models;
+using ViewModel.Interfaces;
 
-namespace Hubtel.Api_IntegrationTest.CardType
+
+namespace Hubtel.Api_IntegrationTest
 {
     public class GetCardTypeControllerTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly CardTypeController _controller;
 
         public GetCardTypeControllerTests()
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "CardTypeTestDb")
                 .Options;
 
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
             _controller = new CardTypeController(_context);
@@ -81,7 +83,7 @@ namespace Hubtel.Api_IntegrationTest.CardType
         {
             await _context.TCardTypes!.AddAsync(new TCardType { Name = "visa" });
             await _context.SaveChangesAsync();
-
+            
             var result = await _controller.GetCardTypeByName("visa");
 
             var okResult = Assert.IsType<OkObjectResult>(result);

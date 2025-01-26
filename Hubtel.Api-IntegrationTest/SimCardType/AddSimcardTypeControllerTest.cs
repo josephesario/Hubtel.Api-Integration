@@ -19,7 +19,7 @@ namespace Hubtel.Api_IntegrationTest.UserType
 {
     public class AddSimcardTypeControllerTest
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly SimcardTypeController _controller;
 
         public AddSimcardTypeControllerTest()
@@ -28,12 +28,12 @@ namespace Hubtel.Api_IntegrationTest.UserType
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
 
             // Configure the DbContext to use InMemory database
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "SimCardTestDb")
                 .Options;
 
             // Create the DbContext with the configuration
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted(); // Clear the database before each test
             _context.Database.EnsureCreated(); // Create the database schema
             _controller = new SimcardTypeController(_context);
@@ -117,11 +117,11 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task AddSimCardType_DbUpdateException_ReturnsInternalServerError()
         {
             // Arrange
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "SimCardTestDb")
                 .Options;
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var context = new HubtelWalletDbContextExtended(options, configuration);
+            var context = new HubtelWalletDbContext(options, configuration);
             var controller = new SimcardTypeController(context);
 
             var simCardType = new Mock<ISimcardType>();
@@ -133,7 +133,7 @@ namespace Hubtel.Api_IntegrationTest.UserType
             await context.TSimcardTypes!.AddAsync(new TSimcardType { Name = "vodafone" });
             await context.SaveChangesAsync();
 
-            var mockContext = new Mock<HubtelWalletDbContextExtended>(options, configuration);
+            var mockContext = new Mock<HubtelWalletDbContext>(options, configuration);
             mockContext.Setup(c => c.TSimcardTypes!.AddAsync(It.IsAny<TSimcardType>(), It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new DbUpdateException("An unexpected error occurred", new Exception("Inner exception message")));
 
@@ -152,11 +152,11 @@ namespace Hubtel.Api_IntegrationTest.UserType
         [Fact]
         public async Task AddSimCardType_UnexpectedException_ReturnsInternalServerError()
         {
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "SimCardTestDb")
                 .Options;
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var mockContext = new Mock<HubtelWalletDbContextExtended>(options, configuration);
+            var mockContext = new Mock<HubtelWalletDbContext>(options, configuration);
             var controller = new SimcardTypeController(mockContext.Object);
 
             var simCardType = new Mock<ISimcardType>();

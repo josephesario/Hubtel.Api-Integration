@@ -13,10 +13,10 @@ namespace Hubtel.Api_Integration.Controllers
     public class AccessController : Controller
     {
 
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public AccessController(HubtelWalletDbContextExtended context, IConfiguration configuration)
+        public AccessController(HubtelWalletDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -75,9 +75,7 @@ namespace Hubtel.Api_Integration.Controllers
                 string secretEncrypt = encryptionService.Encrypt(LoginAccess.UserSecret);
 
 
-                var userAccess = await _context.TUserAccesses!
-                    .Include(x => x.UserType)
-                    .FirstOrDefaultAsync(x => x.EmailPhoneNumber == LoginAccess.EmailPhoneNumber && x.UserSecret == secretEncrypt);
+                var userAccess = await _context.TUserAccesses!.FirstOrDefaultAsync(x => x.EmailPhoneNumber == LoginAccess.EmailPhoneNumber && x.UserSecret == secretEncrypt);
 
                 if (userAccess == null)
                 {
@@ -94,7 +92,7 @@ namespace Hubtel.Api_Integration.Controllers
                 {
 
                     Token tokenService = new(_configuration, _context);
-                    var tokenResponse = await tokenService.GenerateJwtToken(userAccess, userAccess.UserTypeId, userAccess.Id.ToString(), userAccess.EmailPhoneNumber);
+                    var tokenResponse = await tokenService.GenerateJwtToken(userAccess,  userAccess.Id.ToString(), userAccess.EmailPhoneNumber);
 
                     if (tokenResponse == null)
                     {
@@ -169,14 +167,14 @@ namespace Hubtel.Api_Integration.Controllers
         public async Task<IActionResult> SwitchUserType([Required][FromHeader] string UserType)
         {
 
-            if (string.IsNullOrWhiteSpace(UserType) || !Validations.IsEmailPhoneValid(UserType))
+            if (string.IsNullOrWhiteSpace(UserType))
             {
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Invalid User Access data",
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Errors = new[] { "Email Or Phone Number is required" }
+                    Errors = new[] { "User Type Should be either momo or card" }
                 });
             }
             try
@@ -211,10 +209,9 @@ namespace Hubtel.Api_Integration.Controllers
                 }
 
 
-                var CardAccount = await _context.TCardAccountDetails!.FirstOrDefaultAsync(x => x.UserAccessId == userAccess.Id);
-                var PhoneAccount = await _context.TPhoneAccountDetails!.FirstOrDefaultAsync(x => x.UserAccessId == userAccess.Id);
+                var wallet = await _context.TWalletAccountDetails!.FirstOrDefaultAsync(x => x.UserAccessId == userAccess.Id);
 
-                if (CardAccount != null || PhoneAccount != null)
+                if (wallet != null)
                 {
                     return Conflict(new ApiResponse<string>
                     {
@@ -228,22 +225,20 @@ namespace Hubtel.Api_Integration.Controllers
                 {
 
 
-                    var userType = await _context.TUserTypes!.FirstOrDefaultAsync(x => x.Name!.ToLower() == UserType.ToLower());
+                    var userType = await _context.TTypes!.FirstOrDefaultAsync(x => x.Name!.ToLower() == UserType.ToLower());
 
                     if (userType == null)
                     {
                         return NotFound(new ApiResponse<string>
                         {
                             Success = false,
-                            Message = "User Type not found",
+                            Message = "Account Type not found",
                             StatusCode = StatusCodes.Status404NotFound,
-                            Errors = new[] { "User Type not found" }
+                            Errors = new[] { "Account Type not found" }
                         });
                     }
 
 
-
-                    userAccess.UserTypeId = userType.Id;
                     _context.TUserAccesses!.Update(userAccess);
                     var result = await _context.SaveChangesAsync();
 

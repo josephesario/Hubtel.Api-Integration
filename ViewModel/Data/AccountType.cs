@@ -5,7 +5,7 @@ using ViewModel.Interfaces;
 
 namespace ViewModel.Data;
 
-public partial class UserType: IUserType
+public partial class AccountType: IAccountType
 {
     public string? Name { get; set; }
 

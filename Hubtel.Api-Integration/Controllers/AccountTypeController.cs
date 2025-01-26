@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using dbContex.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,27 +8,27 @@ using ViewModel.Interfaces;
 
 namespace Hubtel.Api_Integration.Controllers
 {
-    #region AccessController
+    #region AccountTypeController
     [ApiController]
     [Route("api/[controller]")]
-    public class UserTypeController : ControllerBase
+    public class AccountTypeController : ControllerBase
     {
 
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
 
-        public UserTypeController(HubtelWalletDbContextExtended context)
+        public AccountTypeController(HubtelWalletDbContext context)
         {
             _context = context;
         }
 
         #region AddUserType
-        [HttpPost("AddUserType")]
-        [ProducesResponseType(typeof(ApiResponse<IUserType>), StatusCodes.Status200OK)]
+        [HttpPost("AddAccountType")]
+        [ProducesResponseType(typeof(ApiResponse<IAccountType>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddUserType([Required][FromBody] IUserType userType)
+        public async Task<IActionResult> AccountType([Required][FromBody] IAccountType userType)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
-                var userTypeExists = await _context.TUserTypes!
+                var userTypeExists = await _context.TTypes!
                     .AnyAsync(e => e.Name!.ToLower() == userType.Name!.ToLower(), default);
 
                 if (userTypeExists)
@@ -69,16 +70,16 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
-                var userTypeEntity = new TUserType
+                var userTypeEntity = new TType
                 {
                     Name = userType.Name,
                     CreatedAt = DateTime.UtcNow,
                 };
 
-                await _context.TUserTypes!.AddAsync(userTypeEntity);
+                await _context.TTypes!.AddAsync(userTypeEntity);
                 await _context.SaveChangesAsync();
 
-                return Ok(new ApiResponse<TUserType>
+                return Ok(new ApiResponse<TType>
                 {
                     Success = true,
                     Message = "User Type Added Successfully",
@@ -112,12 +113,12 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region GetUserType
-        [HttpGet("GetUserTypeByName")]
+        [HttpGet("GetAccountTypeByName")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetUserType([FromHeader][Required] string Name)
+        public async Task<IActionResult> GetAccountTypeByName([FromHeader][Required] string Name)
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
@@ -144,7 +145,7 @@ namespace Hubtel.Api_Integration.Controllers
 
             try
             {
-                var userType = await _context.TUserTypes!
+                var userType = await _context.TTypes!
                     .FirstOrDefaultAsync(e => e.Name!.ToLower() == Name);
 
                 return userType == null
@@ -155,7 +156,7 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status404NotFound,
                         Errors = new[] { $"User type with name '{Name}' not found" }
                     })
-                    : Ok(new ApiResponse<TUserType>
+                    : Ok(new ApiResponse<TType>
                     {
                         Success = true,
                         Message = "User Type Found",
@@ -177,15 +178,15 @@ namespace Hubtel.Api_Integration.Controllers
         #endregion
 
         #region GetAllUserTypes
-        [HttpGet("GetAllUserTypes")]
-        [ProducesResponseType(typeof(ApiResponse<IEnumerable<TUserType>>), StatusCodes.Status200OK)]
+        [HttpGet("GetAllAccountType")]
+        [ProducesResponseType(typeof(ApiResponse<IEnumerable<TType>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAllUserTypes()
+        public async Task<IActionResult> GetAllAccountType()
         {
             try
             {
-                var userTypes = await _context.TUserTypes!.ToListAsync();
+                var userTypes = await _context.TTypes!.ToListAsync();
                 return userTypes.Count == 0
                     ? NotFound(new ApiResponse<string>
                     {
@@ -194,7 +195,7 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status404NotFound,
                         Errors = new[] { "No user types found" }
                     })
-                    : Ok(new ApiResponse<IEnumerable<TUserType>>
+                    : Ok(new ApiResponse<IEnumerable<TType>>
                     {
                         Success = true,
                         Message = "User Types Found",
@@ -217,12 +218,12 @@ namespace Hubtel.Api_Integration.Controllers
 
 
         #region DeleteUserType
-        [HttpDelete("DeleteUserType")]
+        [HttpDelete("DeleteAccountType")]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteUserType([FromHeader][Required] string Name)
+        public async Task<IActionResult> DeleteAccountType([FromHeader][Required] string Name)
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
@@ -248,7 +249,7 @@ namespace Hubtel.Api_Integration.Controllers
 
             try
             {
-                var userType = await _context.TUserTypes!
+                var userType = await _context.TTypes!
                     .FirstOrDefaultAsync(e => e.Name!.ToLower() == Name);
                 if (userType == null)
                 {
@@ -261,19 +262,7 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
-                if(await _context.TUserAccesses!.AnyAsync(e => e.UserTypeId == userType.Id))
-                {
-                    return BadRequest(new ApiResponse<string>
-                    {
-                        Success = false,
-                        Message = "User type has dependent data",
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Errors = new[] { $"User type with name '{Name}' has dependent data" }
-                    });
-                }
-
-
-                _context.TUserTypes!.Remove(userType);
+                _context.TTypes!.Remove(userType);
 
 
                 await _context.SaveChangesAsync();

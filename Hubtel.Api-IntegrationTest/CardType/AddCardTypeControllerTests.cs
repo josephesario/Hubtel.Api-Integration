@@ -16,17 +16,17 @@ namespace Hubtel.Api_IntegrationTest.CardType
 {
     public class AddCardTypeControllerTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly CardTypeController _controller;
 
         public AddCardTypeControllerTests()
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "CardTypeTestDb")
                 .Options;
 
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
             _controller = new CardTypeController(_context);
@@ -107,11 +107,11 @@ namespace Hubtel.Api_IntegrationTest.CardType
         [Fact]
         public async Task AddCardType_UnexpectedException_ReturnsInternalServerError()
         {
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "CardTypeTestDb")
                 .Options;
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var mockContext = new Mock<HubtelWalletDbContextExtended>(options, configuration);
+            var mockContext = new Mock<HubtelWalletDbContext>(options, configuration);
             var controller = new CardTypeController(mockContext.Object);
 
             var cardType = new Mock<ICardType>();

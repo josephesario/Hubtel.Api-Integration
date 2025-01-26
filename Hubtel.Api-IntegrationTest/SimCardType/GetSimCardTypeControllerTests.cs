@@ -14,7 +14,7 @@ namespace Hubtel.Api_IntegrationTest.GetSimCardTypeControllerTests
 {
     public class GetSimCardTypeControllerTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly SimcardTypeController _controller;
 
         public GetSimCardTypeControllerTests()
@@ -23,12 +23,12 @@ namespace Hubtel.Api_IntegrationTest.GetSimCardTypeControllerTests
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
 
             // Configure the DbContext to use InMemory database
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "SimCardTestDb")
                 .Options;
 
             // Create the DbContext with the configuration
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted(); // Clear the database before each test
             _context.Database.EnsureCreated(); // Create the database schema
             _controller = new SimcardTypeController(_context);

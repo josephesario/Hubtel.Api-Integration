@@ -13,9 +13,9 @@ namespace Hubtel.Api_Integration.Controllers
     [Route("api/[controller]")]
     public class CardTypeController : ControllerBase
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
 
-        public CardTypeController(HubtelWalletDbContextExtended context)
+        public CardTypeController(HubtelWalletDbContext context)
         {
             _context = context;
         }
@@ -144,12 +144,12 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status404NotFound,
                         Errors = new[] { $"Card type with name '{Name}' not found" }
                     })
-                    : Ok(new ApiResponse<CardType>
+                    : Ok(new ApiResponse<TCardType>
                     {
                         Success = true,
                         Message = "Card Type Found",
                         StatusCode = StatusCodes.Status200OK,
-                        Data = new CardType() { Name = cardType.Name}
+                        Data = new TCardType() { Name = cardType.Name}
 
                     });
             }
@@ -186,12 +186,12 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status404NotFound,
                         Errors = new[] { "No card types found" }
                     })
-                    : Ok(new ApiResponse<IEnumerable<ICardType>> // Using DTO here
+                    : Ok(new ApiResponse<IEnumerable<ICardType>> 
                     {
                         Success = true,
                         Message = "Card Types Found",
                         StatusCode = StatusCodes.Status200OK,
-                        Data = cardTypes.Select(c => new CardType { Name = c.Name }).ToList() // Projecting to DTO
+                        Data = cardTypes.Select(c => new CardType { Name = c.Name }).ToList() 
                     });
 
             }
@@ -257,7 +257,7 @@ namespace Hubtel.Api_Integration.Controllers
                 }
 
                 // Check for dependent data if needed
-                if (await _context.TCardAccountDetails!.AnyAsync(e => e.CardTypeId == cardType.Id))
+                if (await _context.TWalletAccountDetails!.AnyAsync(e => e.CardTypeId == cardType.Id))
                 {
                     return BadRequest(new ApiResponse<string>
                     {

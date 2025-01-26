@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace dbContex.Models;
 
-public partial class TUserType
+public partial class TType
 {
     public Guid Id { get; set; }
 
@@ -11,5 +11,5 @@ public partial class TUserType
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<TUserAccess> TUserAccesses { get; set; } = new List<TUserAccess>();
+    public virtual ICollection<TWalletAccountDetail> TWalletAccountDetails { get; set; } = new List<TWalletAccountDetail>();
 }

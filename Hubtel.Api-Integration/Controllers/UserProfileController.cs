@@ -15,10 +15,10 @@ namespace Hubtel.Api_Integration.Controllers
     [Route("api/[controller]")]
     public class UserProfileController : Controller
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public UserProfileController(HubtelWalletDbContextExtended context, IConfiguration configuration)
+        public UserProfileController(HubtelWalletDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -165,7 +165,7 @@ namespace Hubtel.Api_Integration.Controllers
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetProfileByEmailGhcPhone([FromBody] string EmailGhcPhone)
+        public async Task<IActionResult> GetProfileByEmailGhcPhone([Required][FromHeader] string EmailGhcPhone)
         {
 
 
@@ -193,6 +193,7 @@ namespace Hubtel.Api_Integration.Controllers
             }
 
 
+
             if (Validations.ValidateGhanaID(EmailGhcPhone) == false && Validations.IsEmailPhoneValid(EmailGhcPhone) == false)
             {
                 return BadRequest(new ApiResponse<string>
@@ -204,12 +205,26 @@ namespace Hubtel.Api_Integration.Controllers
                 });
             }
 
+
+
+
+
             try
             {
 
                 var userProfile = await _context.TUserProfiles!.FirstOrDefaultAsync(e => e.IdentityCardNumber!.ToLower() == EmailGhcPhone || e.EmailPhone!.ToLower() == EmailGhcPhone);
                 var currentUserEmailPhone = User.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
 
+                if(currentUserEmailPhone!= EmailGhcPhone)
+                {
+                    return Unauthorized(new ApiResponse<string>
+                    {
+                        Success = false,
+                        Message = "User authenticated",
+                        StatusCode = StatusCodes.Status401Unauthorized,
+                        Errors = new[] { "You Are Not Authorize To View This Data" }
+                    });
+                }
 
                 if (userProfile == null)
                 {
@@ -465,7 +480,7 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
-                var existingProfileAccounts = await _context.TPhoneAccountDetails!.Where(x => x.UserProfileId == existingProfile.Id).ToListAsync();
+                var existingProfileAccounts = await _context.TWalletAccountDetails!.Where(x => x.UserProfileId == existingProfile.Id).ToListAsync();
 
                 if (existingProfileAccounts.Any())
                 {
@@ -476,20 +491,6 @@ namespace Hubtel.Api_Integration.Controllers
                         StatusCode = StatusCodes.Status400BadRequest,
                         Message = "Profile has associated accounts",
                         Errors = new[] { "Profile has associated accounts" }
-                    });
-
-                }
-
-                var existingProfileCards = await _context.TCardAccountDetails!.Where(x => x.UserProfileId == existingProfile.Id).ToListAsync();
-
-                if (existingProfileCards.Any())
-                {
-                    return BadRequest(new ApiResponse<string>
-                    {
-                        Success = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Profile has associated cards",
-                        Errors = new[] { "Profile has associated  card Account" }
                     });
 
                 }

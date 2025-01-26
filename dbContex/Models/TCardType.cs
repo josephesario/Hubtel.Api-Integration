@@ -11,5 +11,5 @@ public partial class TCardType
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<TCardAccountDetail> TCardAccountDetails { get; set; } = new List<TCardAccountDetail>();
+    public virtual ICollection<TWalletAccountDetail> TWalletAccountDetails { get; set; } = new List<TWalletAccountDetail>();
 }

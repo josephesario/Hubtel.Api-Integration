@@ -13,15 +13,15 @@ namespace ViewModel.Interfaces
     {
         private static readonly Dictionary<Type, Type> _interfaceMappings = new()
     {
-        { typeof(IUserType), typeof(UserType) },
+        { typeof(IAccountType), typeof(AccountType) },
         { typeof(ICardType), typeof(CardType) },
         { typeof(ISimcardType), typeof(SimcardType) },
         { typeof(IUserAccess), typeof(UserAccess) },
         { typeof(IUserProfile), typeof(UserProfile) },
-        { typeof(ICardAccountDetail), typeof(CardAccountDetail) },
-        { typeof(ICardAccountDetailOut), typeof(CardAccountDetailOut) },
-        { typeof(IPhoneAccountDetail), typeof(PhoneAccountDetail) },
-        { typeof(IPhoneAccountDetailOut), typeof(PhoneAccountDetailOut) },
+        { typeof(IWalletAccountDetail), typeof(WalletAccountDetail) },
+        { typeof(IWalletAccountDetailOut), typeof(WalletAccountDetailOut) },
+        { typeof(IWalletAccountDetail), typeof(WalletAccountDetail) },
+        { typeof(IWalletAccountDetailOut), typeof(WalletAccountDetailOut) },
         { typeof(ILogin), typeof(Login) }
     };
 

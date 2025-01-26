@@ -13,41 +13,41 @@ using Moq;
 
 namespace Hubtel.Api_IntegrationTest.UserType
 {
-    public class GetAllUserTypeControllerTests
+    public class GetAllAccountTypeControllerTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
-        private readonly UserTypeController _controller;
+        private readonly HubtelWalletDbContext _context;
+        private readonly AccountTypeController _controller;
 
-        public GetAllUserTypeControllerTests()
+        public GetAllAccountTypeControllerTests()
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "UserTypeTestDb")
                 .Options;
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            _controller = new UserTypeController(_context);
+            _controller = new AccountTypeController(_context);
         }
 
         [Fact]
         public async Task GetAllUserTypes_WithUserTypes_ReturnsAllUserTypes()
         {
             // Arrange
-            var userTypes = new List<TUserType>
+            var userTypes = new List<TType>
             {
-                new TUserType { Name = "momo" },
-                new TUserType { Name = "card" }
+                new TType { Name = "momo" },
+                new TType { Name = "card" }
             };
-            await _context.TUserTypes!.AddRangeAsync(userTypes);
+            await _context.TTypes!.AddRangeAsync(userTypes);
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.GetAllUserTypes();
+            var result = await _controller.GetAllAccountType();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var apiResponse = Assert.IsType<ApiResponse<IEnumerable<TUserType>>>(okResult.Value);
+            var apiResponse = Assert.IsType<ApiResponse<IEnumerable<TType>>>(okResult.Value);
             Assert.True(apiResponse.Success);
             Assert.Equal(StatusCodes.Status200OK, apiResponse.StatusCode);
             Assert.Equal(2, apiResponse.Data.Count());
@@ -57,7 +57,7 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task GetAllUserTypes_NoUserTypes_ReturnsNotFound()
         {
             // Act
-            var result = await _controller.GetAllUserTypes();
+            var result = await _controller.GetAllAccountType();
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);

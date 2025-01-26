@@ -17,26 +17,26 @@ using Castle.Core.Configuration;
 
 namespace Hubtel.Api_IntegrationTest.UserType
 {
-    public class AddUserTypeControllerTests
+    public class AddAccountTypeControllerTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
-        private readonly UserTypeController _controller;
+        private readonly HubtelWalletDbContext _context;
+        private readonly AccountTypeController _controller;
 
-        public AddUserTypeControllerTests()
+        public AddAccountTypeControllerTests()
         {
             // Create a new in-memory configuration
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
 
             // Configure the DbContext to use InMemory database
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "UserTypeTestDb")
                 .Options;
 
             // Create the DbContext with the configuration
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted(); // Clear the database before each test
             _context.Database.EnsureCreated(); // Create the database schema
-            _controller = new UserTypeController(_context);
+            _controller = new AccountTypeController(_context);
         }
 
 
@@ -46,10 +46,10 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task AddUserType_NullUserType_ReturnsBadRequest()
         {
             // Arrange
-            IUserType userType = null!;
+            IAccountType userType = null!;
 
             // Act
-            var result = await _controller.AddUserType(userType!);
+            var result = await _controller.AccountType(userType!);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -62,11 +62,11 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task AddUserType_EmptyUserTypeName_ReturnsBadRequest()
         {
             // Arrange
-            var userType = new Mock<IUserType>();
+            var userType = new Mock<IAccountType>();
             userType.SetupGet(u => u.Name).Returns(string.Empty);
 
             // Act
-            var result = await _controller.AddUserType(userType.Object);
+            var result = await _controller.AccountType(userType.Object);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -79,11 +79,11 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task AddUserType_InvalidUserType_ReturnsBadRequest()
         {
             // Arrange
-            var userType = new Mock<IUserType>();
+            var userType = new Mock<IAccountType>();
             userType.SetupGet(u => u.Name).Returns("invalidType");
 
             // Act
-            var result = await _controller.AddUserType(userType.Object);
+            var result = await _controller.AccountType(userType.Object);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -97,14 +97,14 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task AddUserType_ExistingUserType_ReturnsConflict()
         {
             // Arrange
-            var userType = new Mock<IUserType>();
+            var userType = new Mock<IAccountType>();
             userType.SetupGet(u => u.Name).Returns("momo");
 
-            await _context.TUserTypes!.AddAsync(new TUserType { Name = "momo" });
+            await _context.TTypes!.AddAsync(new TType { Name = "momo" });
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.AddUserType(userType.Object);
+            var result = await _controller.AccountType(userType.Object);
 
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
@@ -117,15 +117,15 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task AddUserType_SuccessfulAddition_ReturnsOk()
         {
             // Arrange
-            var userType = new Mock<IUserType>();
+            var userType = new Mock<IAccountType>();
             userType.SetupGet(u => u.Name).Returns("momo");
 
             // Act
-            var result = await _controller.AddUserType(userType.Object);
+            var result = await _controller.AccountType(userType.Object);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var apiResponse = Assert.IsType<ApiResponse<TUserType>>(okResult.Value);
+            var apiResponse = Assert.IsType<ApiResponse<TType>>(okResult.Value);
             Assert.True(apiResponse.Success);
             Assert.Equal(StatusCodes.Status200OK, apiResponse.StatusCode);
         }
@@ -134,29 +134,29 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task AddUserType_DbUpdateException_ReturnsInternalServerError()
         {
             // Arrange
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "UserTypeTestDb")
                 .Options;
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var context = new HubtelWalletDbContextExtended(options, configuration);
-            var controller = new UserTypeController(context);
+            var context = new HubtelWalletDbContext(options, configuration);
+            var controller = new AccountTypeController(context);
 
-            var userType = new Mock<IUserType>();
+            var userType = new Mock<IAccountType>();
             userType.SetupGet(u => u.Name).Returns("momo");
 
 
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
-            await context.TUserTypes!.AddAsync(new TUserType { Name = "momo" });
+            await context.TTypes!.AddAsync(new TType { Name = "momo" });
             await context.SaveChangesAsync();
 
-            var mockContext = new Mock<HubtelWalletDbContextExtended>(options, configuration);
-            mockContext.Setup(c => c.TUserTypes!.AddAsync(It.IsAny<TUserType>(), It.IsAny<CancellationToken>()))
+            var mockContext = new Mock<HubtelWalletDbContext>(options, configuration);
+            mockContext.Setup(c => c.TTypes!.AddAsync(It.IsAny<TType>(), It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new DbUpdateException("An unexpected error occurred", new Exception("Inner exception message")));
 
-            var controllerWithMock = new UserTypeController(mockContext.Object);
+            var controllerWithMock = new AccountTypeController(mockContext.Object);
 
-            var result = await controllerWithMock.AddUserType(userType.Object);
+            var result = await controllerWithMock.AccountType(userType.Object);
 
             var internalServerErrorResult = Assert.IsType<ObjectResult>(result);
             var apiResponse = Assert.IsType<ApiResponse<string>>(internalServerErrorResult.Value);
@@ -169,21 +169,21 @@ namespace Hubtel.Api_IntegrationTest.UserType
         [Fact]
         public async Task AddUserType_UnexpectedException_ReturnsInternalServerError()
         {
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "UserTypeTestDb")
                 .Options;
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var mockContext = new Mock<HubtelWalletDbContextExtended>(options, configuration);
-            var controller = new UserTypeController(mockContext.Object);
+            var mockContext = new Mock<HubtelWalletDbContext>(options, configuration);
+            var controller = new AccountTypeController(mockContext.Object);
 
-            var userType = new Mock<IUserType>();
+            var userType = new Mock<IAccountType>();
             userType.SetupGet(u => u.Name).Returns("momo");
 
-            mockContext.Setup(c => c.TUserTypes!.AddAsync(It.IsAny<TUserType>(), It.IsAny<CancellationToken>()))
+            mockContext.Setup(c => c.TTypes!.AddAsync(It.IsAny<TType>(), It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new Exception("Unexpected error"));
 
             // Act
-            var result = await controller.AddUserType(userType.Object);
+            var result = await controller.AccountType(userType.Object);
 
             // Assert
             var internalServerErrorResult = Assert.IsType<ObjectResult>(result);

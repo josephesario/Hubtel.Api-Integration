@@ -75,8 +75,8 @@ builder.Services.AddCors(options =>
 });
 
 // Add database context
-builder.Services.AddDbContext<HubtelWalletDbContextExtended>(options =>
-    options.UseSqlServer(configuration.GetConnectionString("HubtelWalletDbContextExtended")));
+builder.Services.AddDbContext<HubtelWalletDbContext>(options =>
+    options.UseSqlServer(configuration.GetConnectionString("HubtelWalletDbContext")));
 
 // Add JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

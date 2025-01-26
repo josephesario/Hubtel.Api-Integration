@@ -11,9 +11,9 @@ namespace Hubtel.Api_Integration.Controllers
     [ApiController]
     public class SimcardTypeController : Controller
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
 
-        public SimcardTypeController(HubtelWalletDbContextExtended context)
+        public SimcardTypeController(HubtelWalletDbContext context)
         {
             _context = context;
         }
@@ -239,7 +239,7 @@ namespace Hubtel.Api_Integration.Controllers
                     });
                 }
 
-                var hasDependents = await _context.TPhoneAccountDetails!
+                var hasDependents = await _context.TWalletAccountDetails!
                     .AnyAsync(e => e.SimCardTypeId == simType.Id); 
 
                 if (hasDependents)

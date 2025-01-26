@@ -12,29 +12,29 @@ using dbContex.Models;
 
 namespace Hubtel.Api_IntegrationTest.UserType
 {
-    public class GetUserTypeControllerTests
+    public class GetAccountTypeControllerTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
-        private readonly UserTypeController _controller;
+        private readonly HubtelWalletDbContext _context;
+        private readonly AccountTypeController _controller;
 
-        public GetUserTypeControllerTests()
+        public GetAccountTypeControllerTests()
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "UserTypeTestDb")
                 .Options;
 
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
-            _controller = new UserTypeController(_context);
+            _controller = new AccountTypeController(_context);
         }
 
         [Fact]
         public async Task GetUserType_NullName_ReturnsBadRequest()
         {
             // Act
-            var result = await _controller.GetUserType(null);
+            var result = await _controller.GetAccountTypeByName(null!);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -47,7 +47,7 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task GetUserType_EmptyName_ReturnsBadRequest()
         {
             // Act
-            var result = await _controller.GetUserType("");
+            var result = await _controller.GetAccountTypeByName("");
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -60,7 +60,7 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task GetUserType_InvalidName_ReturnsBadRequest()
         {
             // Act
-            var result = await _controller.GetUserType("invalid");
+            var result = await _controller.GetAccountTypeByName("invalid");
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
@@ -73,11 +73,11 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task GetUserType_NonExistentUserType_ReturnsNotFound()
         {
             // Arrange
-            await _context.TUserTypes!.AddAsync(new TUserType { Name = "momo" });
+            await _context.TTypes!.AddAsync(new TType { Name = "momo" });
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.GetUserType("card");
+            var result = await _controller.GetAccountTypeByName("card");
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -90,15 +90,15 @@ namespace Hubtel.Api_IntegrationTest.UserType
         public async Task GetUserType_ExistingUserType_ReturnsOk()
         {
             // Arrange
-            await _context.TUserTypes!.AddAsync(new TUserType { Name = "momo" });
+            await _context.TTypes!.AddAsync(new TType { Name = "momo" });
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _controller.GetUserType("momo");
+            var result = await _controller.GetAccountTypeByName("momo");
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var apiResponse = Assert.IsType<ApiResponse<TUserType>>(okResult.Value);
+            var apiResponse = Assert.IsType<ApiResponse<TType>>(okResult.Value);
             Assert.True(apiResponse.Success);
             Assert.Equal(StatusCodes.Status200OK, apiResponse.StatusCode);
             Assert.NotNull(apiResponse.Data);

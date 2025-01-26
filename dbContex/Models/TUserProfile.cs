@@ -17,9 +17,7 @@ public partial class TUserProfile
 
     public string EmailPhone { get; set; } = null!;
 
-    public virtual ICollection<TCardAccountDetail> TCardAccountDetails { get; set; } = new List<TCardAccountDetail>();
-
-    public virtual ICollection<TPhoneAccountDetail> TPhoneAccountDetails { get; set; } = new List<TPhoneAccountDetail>();
+    public virtual ICollection<TWalletAccountDetail> TWalletAccountDetails { get; set; } = new List<TWalletAccountDetail>();
 
     public virtual TUserAccess UserAccess { get; set; } = null!;
 }

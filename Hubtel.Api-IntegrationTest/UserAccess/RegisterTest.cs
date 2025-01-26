@@ -15,17 +15,17 @@ namespace Hubtel.Api_IntegrationTest.UserAccessControl
 {
     public class RegisterTest
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly UserAccessController _controller;
 
         public RegisterTest()
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "UserAccessTestDb")
                 .Options;
 
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
             _controller = new UserAccessController(_context, configuration);

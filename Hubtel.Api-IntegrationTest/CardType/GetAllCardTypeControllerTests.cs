@@ -10,21 +10,22 @@ using Xunit;
 using Hubtel.Api_Integration.Controllers;
 using ViewModel.Data;
 using dbContex.Models;
+using ViewModel.Interfaces;
 
 namespace Hubtel.Api_IntegrationTest.CardType
 {
     public class GetAllCardTypeControllerTests
     {
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly CardTypeController _controller;
 
         public GetAllCardTypeControllerTests()
         {
             var configuration = new ConfigurationBuilder().AddInMemoryCollection().Build();
-            var options = new DbContextOptionsBuilder<HubtelWalletDbContextExtended>()
+            var options = new DbContextOptionsBuilder<HubtelWalletDbContext>()
                 .UseInMemoryDatabase(databaseName: "CardTypeTestDb")
                 .Options;
-            _context = new HubtelWalletDbContextExtended(options, configuration);
+            _context = new HubtelWalletDbContext(options, configuration);
             _context.Database.EnsureDeleted();
             _context.Database.EnsureCreated();
             _controller = new CardTypeController(_context);
@@ -44,7 +45,7 @@ namespace Hubtel.Api_IntegrationTest.CardType
             var result = await _controller.GetAllCardTypes();
 
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var apiResponse = Assert.IsType<ApiResponse<IEnumerable<TCardType>>>(okResult.Value);
+            var apiResponse = Assert.IsType<ApiResponse<IEnumerable<ICardType>>>(okResult.Value);
             Assert.True(apiResponse.Success);
             Assert.Equal(StatusCodes.Status200OK, apiResponse.StatusCode);
             Assert.Equal(2, apiResponse.Data.Count());

@@ -15,15 +15,15 @@ namespace Helper.secure
     public class Token
     {
         private readonly IConfiguration _configuration;
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
 
-        public Token(IConfiguration configuration, HubtelWalletDbContextExtended dbContext)
+        public Token(IConfiguration configuration, HubtelWalletDbContext dbContext)
         {
             _configuration = configuration;
             _context = dbContext;
         }
 
-        public async Task<Dictionary<string, string>> GenerateJwtToken(TUserAccess user, Guid userTypeId, string userDetailsId, string emailphone)
+        public async Task<Dictionary<string, string>> GenerateJwtToken(TUserAccess user, string userDetailsId, string emailphone)
         {
             var tokens = new Dictionary<string, string>();
 
@@ -45,10 +45,7 @@ namespace Helper.secure
                 var encryptionService = new EncryptionService(keyBytes, ivBytes);
                 string decryptedSystemAccess = user.EmailPhoneNumber;
 
-                var systemUserType = await _context.TUserTypes!.FirstOrDefaultAsync(e => e.Id.Equals(userTypeId));
-
-                if (systemUserType != null && jwtKey != null)
-                {
+     
                     var tokenBytes = Encoding.UTF8.GetBytes(jwtKey);
                     var key = new SymmetricSecurityKey(tokenBytes);
                     var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
@@ -63,7 +60,7 @@ namespace Helper.secure
 
                         return tokens;
                     }
-                }
+                
 
                 tokens.Add("accessToken", "Error generating tokens!");
                 return tokens;

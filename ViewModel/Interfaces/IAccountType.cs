@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace ViewModel.Interfaces
 {
-    public interface IUserType
+    public interface IAccountType
     {
         public string? Name { get; set; }
 
     }
     public interface IUserTypeRepository
     {
-        Task<List<IUserType>> GetAllUserTypesAsync();
+        Task<List<IAccountType>> GetAllUserTypesAsync();
     }
 
 

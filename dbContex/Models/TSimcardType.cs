@@ -11,5 +11,5 @@ public partial class TSimcardType
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<TPhoneAccountDetail> TPhoneAccountDetails { get; set; } = new List<TPhoneAccountDetail>();
+    public virtual ICollection<TWalletAccountDetail> TWalletAccountDetails { get; set; } = new List<TWalletAccountDetail>();
 }

@@ -18,10 +18,10 @@ namespace Hubtel.Api_Integration.Controllers
     public class UserAccessController : Controller
     {
 
-        private readonly HubtelWalletDbContextExtended _context;
+        private readonly HubtelWalletDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public UserAccessController(HubtelWalletDbContextExtended context, IConfiguration configuration)
+        public UserAccessController(HubtelWalletDbContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -78,7 +78,7 @@ namespace Hubtel.Api_Integration.Controllers
                 string? ivBytesFromJson = _configuration["EncryptionKeys:ivBytes"];
 
 
-                var userType = await _context.TUserTypes!.FirstOrDefaultAsync(x => x.Name == userAccess.UserType);
+                var userType = await _context.TTypes!.FirstOrDefaultAsync(x => x.Name == userAccess.UserType);
 
                 if (userType == null)
                 {
@@ -114,8 +114,7 @@ namespace Hubtel.Api_Integration.Controllers
                 var userAccessEntity = new TUserAccess
                 {
                     EmailPhoneNumber = userAccess.EmailPhoneNumber,
-                    UserSecret = secretEncrypt,
-                    UserTypeId = userType.Id
+                    UserSecret = secretEncrypt
                 };
 
 
@@ -228,7 +227,6 @@ namespace Hubtel.Api_Integration.Controllers
             {
                 EmailPhoneNumber = userAccess.EmailPhoneNumber,
                 UserSecret = userAccess.UserSecret,
-                UserType = userAccess.UserType?.Name!
             };
 
             return Ok(new ApiResponse<IUserAccess>
@@ -279,10 +277,9 @@ namespace Hubtel.Api_Integration.Controllers
                 }
 
 
-                var CardAccount = await _context.TCardAccountDetails!.FirstOrDefaultAsync(x => x.UserAccessId == userAccess.Id);
-                var PhoneAccount = await _context.TPhoneAccountDetails!.FirstOrDefaultAsync(x => x.UserAccessId == userAccess.Id);
+                var CardAccount = await _context.TWalletAccountDetails!.FirstOrDefaultAsync(x => x.UserAccessId == userAccess.Id);
 
-                if (CardAccount!=null || PhoneAccount !=null )
+                if (CardAccount!=null)
                 {
                     return Conflict(new ApiResponse<string>
                     {
