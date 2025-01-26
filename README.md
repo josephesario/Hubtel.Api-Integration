@@ -42,6 +42,12 @@ Before setting up this project, ensure you have the following installed:
 ### Clone the Repository
 
 
+## PROJECT STRUCTURE IMAGE
+![Screenshot 2025-01-26 130443](https://github.com/user-attachments/assets/7a488030-02fa-4798-8176-fe1a0f1cf681)
+![Screenshot 2025-01-26 130500](https://github.com/user-attachments/assets/c01177a6-9033-4d5a-adaa-a708f3887bc2)
+![Screenshot 2025-01-26 130510](https://github.com/user-attachments/assets/f5e97baa-e5ca-4227-9843-c9d9e93d7e9e)
+
+
 
 ### DATABASE SCHEMA!
 ![image](https://github.com/user-attachments/assets/249021a0-a61c-4cd1-8ad0-c25cb51e8439)
